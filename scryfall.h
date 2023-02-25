@@ -1,6 +1,8 @@
 #ifndef MTGSDK_H
 #define MTGSDK_H
 
+#include <stddef.h>
+
 const char* MTG_SDK_HOST;
 const int RESPONSE_BUFFER_SIZE;
 

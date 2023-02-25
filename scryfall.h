@@ -43,7 +43,7 @@ card_t find_card(char* name);
 /**
  * Creates a new card with all of the pointers set to NULL
 */
-card_t init_card()
+card_t init_card();
 
 /**
  * Frees the allocated memory of the card and any child cards

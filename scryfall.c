@@ -53,6 +53,7 @@ card_t find_card(char* name) {
     char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(name) + 20));
     sprintf(sbuffer, "%s/cards/named?exact=%s", MTG_SDK_HOST, name);
     api_response_t response = api_json_response(sbuffer);
+    free(sbuffer);
 
     card_t cresponse = init_card();
 
@@ -98,7 +99,10 @@ card_t find_card(char* name) {
             size_t face_count = 0;
             cJSON_ArrayForEach(face, faces) face_count++;
             cresponse.faces = malloc(sizeof(card_t*)*(face_count+1));
-            if (!cresponse.faces) return cresponse;
+            if (!cresponse.faces) {
+                free(response.response);
+                return cresponse;
+            }
             cresponse.faces[face_count] = NULL;
 
             size_t findex = 0;
@@ -125,6 +129,8 @@ card_t find_card(char* name) {
 
         cJSON_Delete(json);
     }
+
+    free(response.response);
     
     return cresponse;
 }

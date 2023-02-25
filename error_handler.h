@@ -2,6 +2,7 @@
 #define ERROR_HANDLING_H
 
 extern const int ERR_MEMORY;
+extern const int ERR_DB;
 
 void handle_memory_error(const char* filename, unsigned int linenum, const void* const ptr);
 

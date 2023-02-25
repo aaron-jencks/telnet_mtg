@@ -15,7 +15,7 @@ INCLUDES = -I"$(MBEDTLS)/include"
 
 LIBS = "$(MBEDTLS)/library/libmbedx509.a" "$(MBEDTLS)/library/libmbedtls.a" "$(MBEDTLS)/library/libmbedcrypto.a"
 
-SOURCES = main.c scryfall.c
+SOURCES = main.c scryfall.c cJSON.c
 OBJS = $(SOURCES:.c=.o)
 
 all: https_make mtg_server
@@ -29,7 +29,7 @@ mtg_server: https_make $(OBJS)
 main.o: main.c scryfall.o
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
-scryfall.o: scryfall.c scryfall.h https_make
+scryfall.o: scryfall.c scryfall.h https_make cJSON.o
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 .c.o:

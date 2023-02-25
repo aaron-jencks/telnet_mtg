@@ -41,6 +41,12 @@ api_response_t api_json_response(char* url);
 card_t find_card(char* name);
 
 /**
+ * Frees the allocated memory of the card and any child cards
+ * @param card The card to deallocate
+*/
+void delete_card(card_t card);
+
+/**
  * Converts the given card struct to a string for printing
 */
 char* display_card(card_t* card);

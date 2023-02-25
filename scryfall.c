@@ -39,7 +39,9 @@ char* parse_json_for_string(cJSON* item, char* name) {
     if (stritem == NULL || !(cJSON_IsString(stritem) && stritem->valuestring != NULL)) {
         return NULL;
     }
-    return stritem->valuestring;
+    char* temp = calloc(strlen(stritem->valuestring)+1, sizeof(char));
+    temp = strcpy(temp, stritem->valuestring);
+    return temp;
 }
 
 card_t find_card(char* name) {
@@ -91,8 +93,9 @@ card_t find_card(char* name) {
             cJSON* face;
             size_t face_count = 0;
             cJSON_ArrayForEach(face, faces) face_count++;
-            cresponse.faces = malloc(sizeof(card_t*)*face_count);
+            cresponse.faces = malloc(sizeof(card_t*)*(face_count+1));
             if (!cresponse.faces) return cresponse;
+            cresponse.faces[face_count] = NULL;
 
             size_t findex = 0;
             cJSON_ArrayForEach(face, faces) {
@@ -120,6 +123,24 @@ card_t find_card(char* name) {
     }
     
     return cresponse;
+}
+
+void delete_card(card_t card) {
+    if (card.id) free(card.id);
+    if (card.name) free(card.name);
+    if (card.manacost) free(card.manacost);
+    if (card.type) free(card.type);
+    if (card.text) free(card.text);
+    if (card.power) free(card.power);
+    if (card.toughness) free(card.toughness);
+    if (card.loyalty) free(card.loyalty);
+    if (card.faces) {
+        for (card_t** f = card.faces; *f > 0; f++) {
+            delete_card(**f);
+            free(*f);
+        }
+        free(card.faces);
+    }
 }
 
 char* display_card(card_t* card) {

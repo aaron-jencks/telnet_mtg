@@ -53,12 +53,14 @@ void delete_card(card_t card);
 
 /**
  * Converts the given card struct to a string for printing
+ * The caller must free the result
 */
 char* display_card(card_t* card);
 
 /**
  * A similar form of display_card, 
  * but displays a specific face of the card
+ * The caller must free the result
 */
 char* display_card_face(card_t* card, size_t face);
 

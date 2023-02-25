@@ -154,9 +154,92 @@ void delete_card(card_t card) {
 }
 
 char* display_card(card_t* card) {
-    return card->name;
+    size_t tlen = 4;
+    char *name, *cost, *type, *text=0, *power=0, *toughness=0, *loyalty=0;
+
+    if (card->name) {
+        tlen += strlen(card->name);
+        name = card->name;
+    } else {
+        tlen += 4;
+        name = "NONE";
+    }
+
+    if (card->manacost) {
+        tlen += strlen(card->manacost);
+        cost = card->manacost;
+    } else {
+        tlen += 1;
+        cost = "0";
+    }
+
+    if (card->type) {
+        tlen += strlen(card->type);
+        type = card->type;
+    } else {
+        tlen += 4;
+        type = "NONE";
+    }
+
+    if (card->text) {
+        tlen += strlen(card->text);
+        text = card->text;
+    }
+
+    if (card->power) {
+        tlen += strlen(card->power);
+        power = card->power;
+    }
+
+    if (card->toughness) {
+        tlen += strlen(card->toughness);
+        toughness = card->toughness;
+    }
+
+    if (card->loyalty) {
+        tlen += strlen(card->loyalty);
+        loyalty = card->loyalty;
+    }
+
+    char *template = "%s\t%s\n%s\n%s", *pttemplate = "(%s/%s)", *ltemplate = "(%s)", *finaltemplate;
+    char allocd = 1;
+    size_t tsize = strlen(template) + 1;
+    if (power && toughness) {
+        tsize += strlen(pttemplate) + 1;
+        finaltemplate = malloc(sizeof(char) * tsize);
+        finaltemplate[tsize-1] = 0;
+        sprintf(finaltemplate, "%s\n%s", template, pttemplate);
+        tlen += 4;
+    } else if (loyalty) {
+        tsize += strlen(ltemplate) + 1;
+        finaltemplate = malloc(sizeof(char) * tsize);
+        finaltemplate[tsize-1] = 0;
+        sprintf(finaltemplate, "%s\n%s", template, ltemplate);
+        tlen += 3;
+    } else {
+        finaltemplate = template;
+        allocd = 0;
+    }
+
+    char* result = malloc(sizeof(char) * tlen);
+    result[tlen-1]=0;
+
+    if (power && toughness) {
+        sprintf(result, finaltemplate, name, cost, type, text ? text : "", power, toughness);
+    } else if (loyalty) {
+        sprintf(result, finaltemplate, name, cost, type, text ? text : "", loyalty);
+    } else {
+        sprintf(result, finaltemplate, name, cost, type, text ? text : "");
+    }
+
+    if (allocd) free(finaltemplate);
+
+    return result;
 }
 
 char* display_card_face(card_t* card, size_t face) {
-    return ((card_t*)card->faces[face])->name;
+    if (!card->faces || !face) {
+        return display_card(card);
+    }
+    return display_card((card_t*)card->faces[face]);
 }

@@ -6,7 +6,9 @@
 
 int main(int argc, char *argv[]) {
     card_t c = find_card("Solitude");
-    printf("Card: %s \n", c.name);
+    char* dstring = display_card(&c);
+    printf("%s\n", dstring);
+    free(dstring);
     delete_card(c);
     return 0;
 }

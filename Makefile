@@ -41,5 +41,8 @@ https_clean:
 	$(MAKE) -C $(HTTPS_DIR) clean mbedtls_clean
 
 .PHONY:clean
-clean: https_clean
+clean:
 	rm -f mtg_server *.o
+
+.PHONY:clean_all
+clean_all: clean https_clean

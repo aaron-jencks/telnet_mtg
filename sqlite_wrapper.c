@@ -20,7 +20,7 @@ void db_exec(char* statement) {
     }
 
     char* zErrMsg = 0;
-    rc = sqlite3_exec(db, statement, NULL, &zErrMsg);
+    rc = sqlite3_exec(db, statement, NULL, 0, &zErrMsg);
 
     if (rc != SQLITE_OK) {
         error_at_line(1, ERR_DB, "sqlite_wrapper.c", 20, "SQL error: %s", zErrMsg);

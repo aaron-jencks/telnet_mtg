@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
-const char* MTG_SDK_HOST;
-const int RESPONSE_BUFFER_SIZE;
+extern const char* MTG_SDK_HOST;
+extern const int RESPONSE_BUFFER_SIZE;
 
 typedef struct {
     int http_code;

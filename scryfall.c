@@ -2,6 +2,7 @@
 #include "https_client/https.h"
 #include "cJSON.h"
 #include "urlencode.h"
+#include "error_handler.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -10,9 +11,12 @@ const char* MTG_SDK_HOST = "https://api.scryfall.com";
 const int RESPONSE_BUFFER_SIZE = 8192;
 
 api_response_t api_json_response(char* url) {
-    // reaches out to the gathering.io for the info
+    // reaches out to the scryfall for the info
     int current_buff_size = RESPONSE_BUFFER_SIZE, ret;
+
     char* response = malloc(current_buff_size * sizeof(char));
+    handle_memory_error("scryfall.c", 16, response);
+
     HTTP_INFO hi;
 
     http_init(&hi, FALSE);
@@ -22,6 +26,7 @@ api_response_t api_json_response(char* url) {
             // We have an incomplete response
             current_buff_size = hi.response.content_length;
             response = realloc(response, sizeof(char) * current_buff_size);
+            handle_memory_error("scryfall.c", 28, response);
             continue;
         }
         break;
@@ -41,6 +46,7 @@ char* parse_json_for_string(cJSON* item, char* name) {
         return NULL;
     }
     char* temp = calloc(strlen(stritem->valuestring)+1, sizeof(char));
+    handle_memory_error("scryfall.c", 48, temp);
     temp = strcpy(temp, stritem->valuestring);
     return temp;
 }
@@ -52,8 +58,10 @@ card_t init_card() {
 
 card_t find_card(char* name) {
     char* encoded_name = malloc(sizeof(char) * (3 * strlen(name) + 1));
+    handle_memory_error("scryfall.c", 60, encoded_name);
     url_encode(html5, name, encoded_name);
     char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(encoded_name) + 20));
+    handle_memory_error("scryfall.c", 63, sbuffer);
     sprintf(sbuffer, "%s/cards/named?exact=%s", MTG_SDK_HOST, encoded_name);
     api_response_t response = api_json_response(sbuffer);
     free(encoded_name);
@@ -103,6 +111,7 @@ card_t find_card(char* name) {
             size_t face_count = 0;
             cJSON_ArrayForEach(face, faces) face_count++;
             cresponse.faces = malloc(sizeof(card_t*)*(face_count+1));
+            handle_memory_error("scryfall.c", 113, cresponse.faces);
             if (!cresponse.faces) {
                 free(response.response);
                 return cresponse;
@@ -112,6 +121,7 @@ card_t find_card(char* name) {
             size_t findex = 0;
             cJSON_ArrayForEach(face, faces) {
                 card_t* fst = malloc(sizeof(card_t));
+                handle_memory_error("scryfall.c", 123, fst);
                 char** fprops[] = {
                     &fst->name,
                     &fst->manacost,
@@ -211,12 +221,14 @@ char* display_card(card_t* card) {
     if (power && toughness) {
         tsize += strlen(pttemplate) + 1;
         finaltemplate = malloc(sizeof(char) * tsize);
+        handle_memory_error("scryfall.c", 223, finaltemplate);
         finaltemplate[tsize-1] = 0;
         sprintf(finaltemplate, "%s\n%s", template, pttemplate);
         tlen += 4;
     } else if (loyalty) {
         tsize += strlen(ltemplate) + 1;
         finaltemplate = malloc(sizeof(char) * tsize);
+        handle_memory_error("scryfall.c", 230, finaltemplate);
         finaltemplate[tsize-1] = 0;
         sprintf(finaltemplate, "%s\n%s", template, ltemplate);
         tlen += 3;
@@ -226,6 +238,7 @@ char* display_card(card_t* card) {
     }
 
     char* result = malloc(sizeof(char) * tlen);
+    handle_memory_error("scryfall.c", 240, result);
     result[tlen-1]=0;
 
     if (power && toughness) {

@@ -8,7 +8,8 @@ ROOT_DIR = $(CURDIR)
 HTTPS_DIR = $(CURDIR)/https_client
 MBEDTLS = $(HTTPS_DIR)/mbedtls
 
-CFLAGS = -fPIC -DHAVE_CONFIG_H -D_U_="__attribute__((unused))" -O2
+DEBUG = -g
+CFLAGS = $(DEBUG) -fPIC -DHAVE_CONFIG_H -D_U_="__attribute__((unused))"
 LDFLAGS =
 
 INCLUDES = -I"$(MBEDTLS)/include"

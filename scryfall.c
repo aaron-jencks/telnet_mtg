@@ -135,7 +135,7 @@ void delete_card(card_t card) {
     if (card.toughness) free(card.toughness);
     if (card.loyalty) free(card.loyalty);
     if (card.faces) {
-        for (card_t** f = card.faces; *f > 0; f++) {
+        for (card_t** f = (card_t**)card.faces; *f > 0; f++) {
             delete_card(**f);
             free(*f);
         }

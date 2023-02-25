@@ -11,15 +11,13 @@ typedef struct {
 
 typedef struct {
 
+    char* id;
     char* name;
     char* manacost;
     int cmc;
     char* type;
-    char** names;
-    char** rulings;
+    void** faces;
     char* text;
-    char* layout;
-    char* multiverseid;
     char* power;
     char* toughness;
     char* loyalty;
@@ -39,5 +37,16 @@ api_response_t api_json_response(char* url);
  * @returns a struct representing the desired card, or NULL if not found
 */
 card_t find_card(char* name);
+
+/**
+ * Converts the given card struct to a string for printing
+*/
+char* display_card(card_t* card);
+
+/**
+ * A similar form of display_card, 
+ * but displays a specific face of the card
+*/
+char* display_card_face(card_t* card, size_t face);
 
 #endif

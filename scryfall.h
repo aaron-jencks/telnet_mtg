@@ -41,6 +41,11 @@ api_response_t api_json_response(char* url);
 card_t find_card(char* name);
 
 /**
+ * Creates a new card with all of the pointers set to NULL
+*/
+card_t init_card()
+
+/**
  * Frees the allocated memory of the card and any child cards
  * @param card The card to deallocate
 */

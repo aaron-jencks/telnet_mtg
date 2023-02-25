@@ -44,13 +44,17 @@ char* parse_json_for_string(cJSON* item, char* name) {
     return temp;
 }
 
+card_t init_card() {
+    card_t result = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    return result;
+}
+
 card_t find_card(char* name) {
     char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(name) + 20));
     sprintf(sbuffer, "%s/cards/named?exact=%s", MTG_SDK_HOST, name);
     api_response_t response = api_json_response(sbuffer);
 
-    card_t cresponse;
-    cresponse.name = "NOT FOUND";
+    card_t cresponse = init_card();
 
     if (response.http_code == 200) {
         cJSON* json = cJSON_Parse(response.response);

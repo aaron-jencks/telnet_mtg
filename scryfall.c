@@ -1,6 +1,7 @@
 #include "scryfall.h"
 #include "https_client/https.h"
 #include "cJSON.h"
+#include "urlencode.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -50,9 +51,12 @@ card_t init_card() {
 }
 
 card_t find_card(char* name) {
-    char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(name) + 20));
-    sprintf(sbuffer, "%s/cards/named?exact=%s", MTG_SDK_HOST, name);
+    char* encoded_name = malloc(sizeof(char) * (3 * strlen(name) + 1));
+    url_encode(html5, name, encoded_name);
+    char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(encoded_name) + 20));
+    sprintf(sbuffer, "%s/cards/named?exact=%s", MTG_SDK_HOST, encoded_name);
     api_response_t response = api_json_response(sbuffer);
+    free(encoded_name);
     free(sbuffer);
 
     card_t cresponse = init_card();

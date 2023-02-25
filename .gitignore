@@ -52,3 +52,4 @@ Mkfile.old
 dkms.conf
 mtg_server
 scryfall.h
+.vscode/settings.json

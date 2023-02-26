@@ -33,6 +33,9 @@ main.o: main.c scryfall.o urlencode.o sqlite_wrapper.o
 scryfall.o: scryfall.c scryfall.h https_make cJSON.o urlencode.o error_handler.o
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
+sqlite_wrapper.o: sqlite_wrapper.c sqlite_wrapper.h entities.h
+	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
+
 .c.o:
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 

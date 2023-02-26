@@ -1,9 +1,9 @@
-#include <sqlite3.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <error.h>
-#include <pthread.h>
 #include "error_handler.h"
+#include "entities.h"
+#include "sqlite_wrapper.h"
 
 const char* const DB_PATH = "./db.db";
 
@@ -24,6 +24,28 @@ void db_exec(char* statement) {
 
     if (rc != SQLITE_OK) {
         error_at_line(1, ERR_DB, "sqlite_wrapper.c", 20, "SQL error: %s", zErrMsg);
+    } else {
+        printf("Statement run successfully!\n");
+    }
+
+    sqlite3_close(db);
+    pthread_mutex_unlock(&db_lock);
+}
+
+void db_exec_w_callback(char* statement, int callback (void*, int, char**, char**)) {
+    pthread_mutex_lock(&db_lock);
+    int rc = sqlite3_open(DB_PATH, &db);
+    if (rc) {
+        error_at_line(1, ERR_DB, "sqlite_wrapper.c", 38, "Error occured while opening database: %s", sqlite3_errmsg(db));
+    } else {
+        printf("Opened database successfully!\n");
+    }
+
+    char* zErrMsg = 0;
+    rc = sqlite3_exec(db, statement, callback, 0, &zErrMsg);
+
+    if (rc != SQLITE_OK) {
+        error_at_line(1, ERR_DB, "sqlite_wrapper.c", 46, "SQL error: %s", zErrMsg);
     } else {
         printf("Statement run successfully!\n");
     }

@@ -54,3 +54,4 @@ mtg_server
 scryfall.h
 .vscode/settings.json
 .vscode/c_cpp_properties.json
+db.db

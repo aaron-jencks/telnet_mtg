@@ -142,6 +142,8 @@ card_t find_card(char* name) {
         }
 
         cJSON_Delete(json);
+    } else {
+        error_at_line(3, ERR_SCRYFALL, "scryfall.c", 66, "Scryfall server responded with: %d\n%s", response.http_code, response.response);
     }
 
     free(response.response);

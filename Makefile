@@ -10,7 +10,7 @@ MBEDTLS = $(HTTPS_DIR)/mbedtls
 
 DEBUG = -g
 CFLAGS = $(DEBUG) -fPIC -DHAVE_CONFIG_H -D_U_="__attribute__((unused))" -O2
-LDFLAGS = -pthread
+LDFLAGS = -pthread -lsqlite3
 
 INCLUDES = -I"$(MBEDTLS)/include"
 

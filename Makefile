@@ -44,5 +44,9 @@ https_clean:
 clean:
 	rm -f mtg_server *.o
 
+.PHONY:clean_db
+clean_db:
+	rm -f *.db
+
 .PHONY:clean_all
-clean_all: clean https_clean
+clean_all: clean https_clean clean_db

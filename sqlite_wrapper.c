@@ -33,7 +33,7 @@ void db_exec(char* statement) {
 }
 
 void create_tables() {
-    db_exec("create table if not exist cards (id text primary key, name text unique not null, manacost text not null, type_string text not null, oracle_text text, power text, toughness text, loyalty text)");
-    db_exec("create table if not exist players (pid int primary key autoincrement, username text not null unique, password text not null)");
-    db_exec("create table if not exist decks (deck_entry_id int primary key autoincrement, deck_id int not null, card_id text not null references cards (name) on delete cascade, quantity integer not null default 1)");
+    db_exec("create table if not exists cards (id text primary key, name text unique not null, manacost text not null, type_string text not null, oracle_text text, power text, toughness text, loyalty text)");
+    db_exec("create table if not exists players (pid integer primary key autoincrement, username text not null unique, password text not null)");
+    db_exec("create table if not exists decks (deck_entry_id integer primary key autoincrement, deck_id integer not null, card_id text not null references cards (name) on delete cascade, quantity integer not null default 1)");
 }

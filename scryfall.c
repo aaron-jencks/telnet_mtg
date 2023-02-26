@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <error.h>
 
 const char* MTG_SDK_HOST = "https://api.scryfall.com";
 const int RESPONSE_BUFFER_SIZE = 8192;
@@ -57,7 +58,7 @@ card_t init_card() {
 }
 
 card_t find_card(char* name) {
-    char* encoded_name = malloc(sizeof(char) * (3 * strlen(name) + 1));
+    char* encoded_name = calloc((3 * strlen(name) + 1), sizeof(char));
     handle_memory_error("scryfall.c", 60, encoded_name);
     url_encode(html5, name, encoded_name);
     char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(encoded_name) + 20));

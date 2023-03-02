@@ -1,6 +1,8 @@
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
 
+#include <stddef.h>
+
 typedef struct {
     void** arr;
     size_t capacity;

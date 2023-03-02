@@ -1,6 +1,8 @@
 #ifndef UI_H
 #define UI_H
 
+#include <stddef.h>
+
 /**
  * Displays a menu for the user to interact with
  * This loops until the user selects a valid entry

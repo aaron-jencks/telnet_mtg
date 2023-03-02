@@ -16,7 +16,7 @@ INCLUDES = -I"$(MBEDTLS)/include"
 
 LIBS = "$(MBEDTLS)/library/libmbedx509.a" "$(MBEDTLS)/library/libmbedtls.a" "$(MBEDTLS)/library/libmbedcrypto.a"
 
-SOURCES = main.c scryfall.c cJSON.c urlencode.c error_handler.c sqlite_wrapper.c
+SOURCES = main.c scryfall.c cJSON.c urlencode.c error_handler.c sqlite_wrapper.c player.c
 OBJS = $(SOURCES:.c=.o)
 
 all: https_make mtg_server
@@ -27,13 +27,16 @@ https_make:
 mtg_server: https_make $(OBJS)
 	$(CC) -o $@ $(HTTPS_DIR)/https.o $(OBJS) $(LDFLAGS) $(LIBS)
 
-main.o: main.c scryfall.o urlencode.o sqlite_wrapper.o
+main.o: main.c scryfall.o urlencode.o sqlite_wrapper.o player.o entities.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 scryfall.o: scryfall.c scryfall.h https_make cJSON.o urlencode.o error_handler.o
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 sqlite_wrapper.o: sqlite_wrapper.c sqlite_wrapper.h entities.h
+	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
+
+player.o: player.c player.h sqlite_wrapper.o entities.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 .c.o:

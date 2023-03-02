@@ -23,7 +23,7 @@ void db_exec(char* statement) {
     rc = sqlite3_exec(db, statement, NULL, 0, &zErrMsg);
 
     if (rc != SQLITE_OK) {
-        error_at_line(1, ERR_DB, "sqlite_wrapper.c", 20, "SQL error: %s", zErrMsg);
+        error_at_line(1, ERR_DB, "sqlite_wrapper.c", 20, "SQL error: %s\nIn statement: %s", zErrMsg, statement);
     } else {
         printf("Statement run successfully!\n");
     }
@@ -45,7 +45,7 @@ void db_exec_w_callback(char* statement, int callback (void*, int, char**, char*
     rc = sqlite3_exec(db, statement, callback, 0, &zErrMsg);
 
     if (rc != SQLITE_OK) {
-        error_at_line(1, ERR_DB, "sqlite_wrapper.c", 46, "SQL error: %s", zErrMsg);
+        error_at_line(1, ERR_DB, "sqlite_wrapper.c", 45, "SQL error: %s\nIn statement: %s", zErrMsg, statement);
     } else {
         printf("Statement run successfully!\n");
     }

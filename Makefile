@@ -16,7 +16,7 @@ INCLUDES = -I"$(MBEDTLS)/include"
 
 LIBS = "$(MBEDTLS)/library/libmbedx509.a" "$(MBEDTLS)/library/libmbedtls.a" "$(MBEDTLS)/library/libmbedcrypto.a"
 
-SOURCES = main.c scryfall.c cJSON.c urlencode.c error_handler.c sqlite_wrapper.c player.c
+SOURCES = main.c scryfall.c cJSON.c urlencode.c error_handler.c sqlite_wrapper.c player.c arraylist.c ui.c
 OBJS = $(SOURCES:.c=.o)
 
 all: https_make mtg_server

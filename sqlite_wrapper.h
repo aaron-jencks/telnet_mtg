@@ -19,7 +19,7 @@ void db_exec(char* statement);
  * Executes a sql statement in the database
  * Use for statements where the result does matter
 */
-void db_exec_w_callback(char* statement, int callback (void*, int, char**, char**));
+void db_exec_w_callback(char* statement, int (*callback) (void*, int, char**, char**));
 
 /**
  * Initializes the sql tables for the database

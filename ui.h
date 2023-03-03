@@ -1,7 +1,37 @@
 #ifndef UI_H
 #define UI_H
 
+#include "arraylist.h"
 #include <stddef.h>
+
+/**
+ * Represents a window that the user can interact with
+*/
+typedef struct {
+    /**
+     * A function for interacting with the window
+    */
+    interaction_response_t (*interact)();
+} window_t;
+
+/**
+ * Represents the response of interacting with a window
+*/
+typedef struct {
+    window_t* window; // The window to push onto the stack, if NULL the no window is pushed.
+    char keep; // Determines whether to keep the parent window, or pop it off.
+} interaction_response_t;
+
+/**
+ * Contains the window stack that a user has
+*/
+typedef struct {
+    /**
+     * The current stack of windows
+     * The window on top is the one currently being displayed
+    */
+    arraylist_t stack;
+} window_controller_t;
 
 /**
  * Displays a menu for the user to interact with
@@ -13,5 +43,32 @@
  * @returns Returns the index of the entry selected
 */
 size_t menu(char* title, char* description, char** entries, size_t entry_count);
+
+/**
+ * Creates a new window controller with it's own stack
+ * @returns Returns the new window controller
+*/
+window_controller_t create_window_controller();
+
+/**
+ * Pushes a new window onto the stack.
+ * It is now the currently displayed window.
+*/
+void wc_push_window(window_controller_t wc, window_t* window);
+
+/**
+ * Pops the window off the top of the stack.
+ * The window below it is the one now being displayed.
+*/
+window_t* wc_pop_window(window_controller_t wc);
+
+/**
+ * Runs the ui loop
+ * There needs to be at least a single window on the stack before starting
+ * Loops by displaying the top window and handling the return value
+ * If the return value of the interaction is NULL then no window is put in it's place
+ * otherwise it pushes that window onto the stack and repeats
+*/
+void wc_loop(window_controller_t wc);
 
 #endif

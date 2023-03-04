@@ -5,6 +5,14 @@
 #include <stddef.h>
 
 /**
+ * Represents the response of interacting with a window
+*/
+typedef struct {
+    void* window; // The window to push onto the stack, if NULL the no window is pushed. Must be of type window_t
+    char keep; // Determines whether to keep the parent window, or pop it off.
+} interaction_response_t;
+
+/**
  * Represents a window that the user can interact with
 */
 typedef struct {
@@ -13,14 +21,6 @@ typedef struct {
     */
     interaction_response_t (*interact)();
 } window_t;
-
-/**
- * Represents the response of interacting with a window
-*/
-typedef struct {
-    window_t* window; // The window to push onto the stack, if NULL the no window is pushed.
-    char keep; // Determines whether to keep the parent window, or pop it off.
-} interaction_response_t;
 
 /**
  * Contains the window stack that a user has

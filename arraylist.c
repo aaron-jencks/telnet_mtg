@@ -63,3 +63,13 @@ size_t arraylist_insert(arraylist_t arr, size_t index, void* value) {
 void* arraylist_dequeue(arraylist_t arr) {
     return arraylist_remove(arr, 0);
 }
+
+size_t arraylist_len(arraylist_t arr) {
+    if (arr.arr) return arr.count;
+    return 0;
+}
+
+void* arraylist_last(arraylist_t arr) {
+    if (arr.count) return arraylist_index(arr, arr.count-1);
+    return NULL;
+}

@@ -71,4 +71,16 @@ size_t arraylist_insert(arraylist_t arr, size_t index, void* value);
 */
 void* arraylist_dequeue(arraylist_t arr);
 
+/**
+ * Returns the number of elements in the arraylist,
+ * or zero if the buffer isn't allocated yet
+*/
+size_t arraylist_len(arraylist_t arr);
+
+/**
+ * Returns the last element of the array, or NULL
+ * if there aren't any elements in the arraylist
+*/
+void* arraylist_last(arraylist_t arr);
+
 #endif

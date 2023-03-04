@@ -39,6 +39,9 @@ sqlite_wrapper.o: sqlite_wrapper.c sqlite_wrapper.h entities.h
 player.o: player.c player.h sqlite_wrapper.o entities.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
+ui.o: ui.c ui.h arraylist.o
+	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
+
 .c.o:
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 

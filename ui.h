@@ -51,6 +51,11 @@ size_t menu(char* title, char* description, char** entries, size_t entry_count);
 window_controller_t create_window_controller();
 
 /**
+ * Deallocates the arraylist used for the stack of the window controller.
+*/
+void destroy_window_controller(window_controller_t wc);
+
+/**
  * Pushes a new window onto the stack.
  * It is now the currently displayed window.
 */

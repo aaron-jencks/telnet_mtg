@@ -1,5 +1,5 @@
-#include "io/sqlite_wrapper.h"
-#include "utils/error_handler.h"
+#include "../io/sqlite_wrapper.h"
+#include "../utils/error_handler.h"
 #include "player.h"
 #include <pthread.h>
 #include <string.h>

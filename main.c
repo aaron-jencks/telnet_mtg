@@ -3,8 +3,8 @@
 #include <string.h>
 #include "utils/urlencode.h"
 #include "io/sqlite_wrapper.h"
-#include "entities.h"
-#include "player.h"
+#include "entities/entities.h"
+#include "entities/player.h"
 #include "ui.h"
 
 int main(int argc, char *argv[]) {

@@ -1,7 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
-#include "arraylist.h"
+#include "utils/arraylist.h"
 #include <stddef.h>
 
 /**
@@ -43,6 +43,11 @@ typedef struct {
  * @returns Returns the index of the entry selected
 */
 size_t menu(char* title, char* description, char** entries, size_t entry_count);
+
+/**
+ * Creates a new window with the given interaction function
+*/
+window_t* create_window(interaction_response_t (*handler)());
 
 /**
  * Creates a new window controller with it's own stack

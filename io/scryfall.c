@@ -1,8 +1,8 @@
 #include "scryfall.h"
 #include "https_client/https.h"
-#include "cJSON.h"
-#include "urlencode.h"
-#include "error_handler.h"
+#include "../utils/cJSON.h"
+#include "../utils/urlencode.h"
+#include "../utils/error_handler.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "utils/error_handler.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,6 +16,13 @@ size_t menu(char* title, char* description, char** entries, size_t entry_count) 
         else break;
     }
     return response;
+}
+
+window_t* create_window(interaction_response_t (*handler)()) {
+    window_t* result = malloc(sizeof(window_t));
+    handle_memory_error("ui.c", 22, result);
+    result->interact = handler;
+    return result;
 }
 
 window_controller_t create_window_controller() {

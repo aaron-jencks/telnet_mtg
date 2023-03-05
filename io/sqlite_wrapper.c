@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <error.h>
-#include "error_handler.h"
-#include "entities.h"
+#include "../utils/error_handler.h"
+#include "../entities.h"
 #include "sqlite_wrapper.h"
 
 const char* const DB_PATH = "./db.db";

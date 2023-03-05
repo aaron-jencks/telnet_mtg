@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "scryfall.h"
-#include "urlencode.h"
-#include "sqlite_wrapper.h"
+#include "utils/urlencode.h"
+#include "io/sqlite_wrapper.h"
 #include "entities.h"
 #include "player.h"
-
+#include "ui.h"
 
 int main(int argc, char *argv[]) {
     create_tables();

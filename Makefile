@@ -1,45 +1,31 @@
-MAKE = make
+include ./Makefile.variable
 
-CC = $(CROSS)gcc
-LD = $(CROSS)ld
-STRIP = $(CROSS)strip
+SOURCES = main.c player.c ui.c
+IO_SOURCES = io/scryfall.c io/sqlite_wrapper.c
+UTILS_SOURCES = utils/arraylist.c utils/cJSON.c utils/error_handler.c utils/urlencode.c
+UTILS_OBJS = $(UTILS_SOURCES:.c=.o)
+IO_OBJS = $(IO_SOURCES:.c=.o)
+MAIN_OBJS = $(SOURCES:.c=.o)
+OBJS = $(MAIN_OBJS) $(IO_OBJS) $(UTILS_OBJS)
 
-ROOT_DIR = $(CURDIR)
-HTTPS_DIR = $(CURDIR)/https_client
-MBEDTLS = $(HTTPS_DIR)/mbedtls
+all: mtg_server
 
-DEBUG = -g
-CFLAGS = $(DEBUG) -fPIC -DHAVE_CONFIG_H -D_U_="__attribute__((unused))" -O2
-LDFLAGS = -pthread -lsqlite3
-
-INCLUDES = -I"$(MBEDTLS)/include"
-
-LIBS = "$(MBEDTLS)/library/libmbedx509.a" "$(MBEDTLS)/library/libmbedtls.a" "$(MBEDTLS)/library/libmbedcrypto.a"
-
-SOURCES = main.c scryfall.c cJSON.c urlencode.c error_handler.c sqlite_wrapper.c player.c arraylist.c ui.c
-OBJS = $(SOURCES:.c=.o)
-
-all: https_make mtg_server
-
-https_make:
-	$(MAKE) -C $(HTTPS_DIR) mbedtls_make https.o
-
-mtg_server: https_make $(OBJS)
+mtg_server: io utils $(MAIN_OBJS)
 	$(CC) -o $@ $(HTTPS_DIR)/https.o $(OBJS) $(LDFLAGS) $(LIBS)
 
-main.o: main.c scryfall.o urlencode.o sqlite_wrapper.o player.o entities.h
+io:.
+	$(MAKE) -C io
+
+utils:.
+	$(MAKE) -C utils
+
+main.o: main.c utils/urlencode.h player.h entities.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
-scryfall.o: scryfall.c scryfall.h https_make cJSON.o urlencode.o error_handler.o
+player.o: player.c player.h entities.h utils/error_handler.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
-sqlite_wrapper.o: sqlite_wrapper.c sqlite_wrapper.h entities.h
-	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
-
-player.o: player.c player.h sqlite_wrapper.o entities.h
-	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
-
-ui.o: ui.c ui.h arraylist.o
+ui.o: ui.c ui.h utils/arraylist.h utils/error_handler.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 .c.o:
@@ -51,7 +37,7 @@ https_clean:
 
 .PHONY:clean
 clean:
-	rm -f mtg_server *.o
+	rm -f mtg_server $(OBJS)
 
 .PHONY:clean_db
 clean_db:

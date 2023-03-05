@@ -1,0 +1,15 @@
+CC = $(CROSS)gcc
+LD = $(CROSS)ld
+STRIP = $(CROSS)strip
+
+ROOT_DIR = $(CURDIR)
+HTTPS_DIR = $(CURDIR)/io/https_client
+MBEDTLS = $(HTTPS_DIR)/mbedtls
+
+DEBUG = -g
+CFLAGS = $(DEBUG) -fPIC -DHAVE_CONFIG_H -D_U_="__attribute__((unused))" -O2
+LDFLAGS = -pthread -lsqlite3
+
+INCLUDES = -I"$(MBEDTLS)/include"
+
+LIBS = "$(MBEDTLS)/library/libmbedx509.a" "$(MBEDTLS)/library/libmbedtls.a" "$(MBEDTLS)/library/libmbedcrypto.a"

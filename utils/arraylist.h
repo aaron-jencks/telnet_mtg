@@ -18,6 +18,7 @@ arraylist_t create_arraylist(size_t capacity);
 
 /**
  * Creates an arraylist with the given initial capacity
+ * The returned pointer must be free'd by the caller
  * @param capacity the initial capacity to use.
  * @returns Returns a pointer to a new arraylist
 */

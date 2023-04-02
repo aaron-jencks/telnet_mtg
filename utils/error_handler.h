@@ -4,6 +4,7 @@
 extern const int ERR_MEMORY;
 extern const int ERR_DB;
 extern const int ERR_SCRYFALL;
+extern const int ERR_DICT_SIZE;
 
 void handle_memory_error(const char* filename, unsigned int linenum, const void* const ptr);
 

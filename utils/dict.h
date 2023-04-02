@@ -25,6 +25,7 @@ typedef struct {
     hashing_function hash_function;
     comparator key_comparing_func;
     size_t count;
+    float rehash_threshold;
 } dict_t;
 
 /**
@@ -87,5 +88,21 @@ void dict_put(dict_t dict, void* key, void* value);
  * @return void* Returns the deleted value, or NULL if it didn't exist
  */
 void* dict_remove(dict_t dict, void* key);
+
+/**
+ * @brief Rehashes the current dict and creates additional bins
+ * 
+ * @param dict the dict to rehash
+ * @param new_size the new number of bins to contain
+ */
+void dict_resize(dict_t dict, size_t new_size);
+
+/**
+ * @brief Returns the load factor of the dictionary
+ * 
+ * @param dict the dictionary to return the laod factor for
+ * @return float Returns the load factor
+ */
+float dict_load_factor(dict_t dict);
 
 #endif

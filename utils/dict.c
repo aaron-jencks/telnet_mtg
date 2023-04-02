@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <error.h>
 
 #include "dict.h"
 #include "error_handler.h"
@@ -47,34 +48,34 @@ void* dict_get(dict_t dict, void* key) {
     return NULL;
 }
 
-void dict_put(dict_t dict, void* key, void* value) {
-    arraylist_t* b = get_bin_for_key(dict, key);
+void dict_put(dict_t* dict, void* key, void* value) {
+    arraylist_t* b = get_bin_for_key(*dict, key);
     for (size_t kvp = 0; kvp < arraylist_len(*b); kvp++) {
         key_value_pair_t* kvpp = (key_value_pair_t*)arraylist_index(*b, kvp);
-        if (!dict.key_comparing_func(kvpp->key, key)) {
+        if (!dict->key_comparing_func(kvpp->key, key)) {
             kvpp->value = value;
             return;
         }
     }
     key_value_pair_t* kvp = (key_value_pair_t*)malloc(sizeof(key_value_pair_t));
-    handle_memory_error("dict.c", 59, kvp);
+    handle_memory_error("dict.c", 60, kvp);
     kvp->key = key;
     kvp->value = value;
     arraylist_append(*b, kvp);
-    dict.count++;
+    dict->count++;
 
-    if (dict_load_factor(dict) > dict.rehash_threshold) 
-        dict_resize(dict, dict.bins.count + 10);
+    if (dict_load_factor(*dict) > dict->rehash_threshold) 
+        dict_resize(*dict, dict->bins.count + 10);
 }
 
-void* dict_remove(dict_t dict, void* key) {
-    arraylist_t* b = get_bin_for_key(dict, key);
+void* dict_remove(dict_t* dict, void* key) {
+    arraylist_t* b = get_bin_for_key(*dict, key);
     for (size_t kvp = 0; kvp < arraylist_len(*b); kvp++) {
         key_value_pair_t* kvpp = (key_value_pair_t*)arraylist_index(*b, kvp);
-        if (!dict.key_comparing_func(kvpp->key, key)) {
+        if (!dict->key_comparing_func(kvpp->key, key)) {
             arraylist_remove(*b, kvp);
             void* v = kvpp->value;
-            dict.count--;
+            dict->count--;
             free(kvpp);
             return v;
         }
@@ -99,7 +100,7 @@ arraylist_t dict_to_list(dict_t dict, bool empty) {
 
 void dict_resize(dict_t dict, size_t new_size) {
     if (new_size <= dict.bins.count) {
-        error_at_line(ERR_DICT_SIZE, 0, "dict.c", 101, "New dict size must be larger than previous size");
+        error_at_line(ERR_DICT_SIZE, 0, "dict.c", 102, "New dict size must be larger than previous size");
     }
 
     // Empty the dict

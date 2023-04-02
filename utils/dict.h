@@ -78,7 +78,7 @@ void* dict_get(dict_t dict, void* key);
  * @param key The key for the value to insert
  * @param value The value to assign to the given key
  */
-void dict_put(dict_t dict, void* key, void* value);
+void dict_put(dict_t* dict, void* key, void* value);
 
 /**
  * @brief Deletes the given key from the dictionary if it exists
@@ -87,7 +87,7 @@ void dict_put(dict_t dict, void* key, void* value);
  * @param key The key to delete from the dictionary
  * @return void* Returns the deleted value, or NULL if it didn't exist
  */
-void* dict_remove(dict_t dict, void* key);
+void* dict_remove(dict_t* dict, void* key);
 
 /**
  * @brief Rehashes the current dict and creates additional bins

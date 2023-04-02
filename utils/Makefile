@@ -7,7 +7,10 @@ OBJS = $(SOURCES:.c=.o)
 
 all: $(OBJS)
 
-dict.o: dict.c dict.h arraylist.h
+dict.o: dict.c dict.h arraylist.h error_handler.h
+	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
+
+arraylist.o: arraylist.c arraylist.h error_handler.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 .c.o:

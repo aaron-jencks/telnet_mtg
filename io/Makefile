@@ -2,7 +2,7 @@ include ../Makefile.variable
 
 HTTPS_DIR = $(CURDIR)/https_client
 
-SOURCES = scryfall.c sqlite_wrapper.c celnet.c
+SOURCES = scryfall.c sqlite_wrapper.c celnet.c telnet.c
 OBJS = $(SOURCES:.c=.o)
 
 all: https_make $(OBJS)
@@ -14,6 +14,9 @@ scryfall.o: scryfall.c scryfall.h https_make ../utils/cJSON.h ../utils/error_han
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 sqlite_wrapper.o: sqlite_wrapper.c sqlite_wrapper.h ../entities/entities.h ../utils/error_handler.h
+	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
+
+telnet.o: telnet.c telnet.h celnet.h ../utils/dict.h ../utils/error_handler.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 .c.o:

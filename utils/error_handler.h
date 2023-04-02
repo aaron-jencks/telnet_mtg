@@ -5,6 +5,7 @@ extern const int ERR_MEMORY;
 extern const int ERR_DB;
 extern const int ERR_SCRYFALL;
 extern const int ERR_DICT_SIZE;
+extern const int ERR_MUTEX_INIT;
 
 void handle_memory_error(const char* filename, unsigned int linenum, const void* const ptr);
 

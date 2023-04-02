@@ -8,11 +8,33 @@
 
 typedef size_t (*hashing_function)(void*);
 
+/**
+ * @brief Represents a comparator, compares the two input values and
+ * @returns 0 if equal, <0 if arg1 < arg2, and >0 if arg1 > arg2
+ * 
+ */
+typedef int (*comparator)(void*, void*);
+
+typedef struct {
+    void* key;
+    void* value;
+} key_value_pair_t;
+
 typedef struct {
     arraylist_t bins;
     hashing_function hash_function;
+    comparator key_comparing_func;
     size_t count;
 } dict_t;
+
+/**
+ * @brief The default pointer comparator evaluates the literal pointer values
+ * 
+ * @param a 
+ * @param b 
+ * @return int (int)(a-b)
+ */
+int default_comparator(void* a, void* b);
 
 /**
  * Creates a new dictionary with the given number of bins and the given hashing function
@@ -32,34 +54,38 @@ void destroy_dict(dict_t dict);
 /**
  * @brief Checks if the given key contains a non-null value in the dictionary
  * 
+ * @param dict The dictionary to look in
  * @param key The key to check for
  * @return true if the key exists in the dictionary
  * @return false if the key does not exist in the dictionary
  */
-bool dict_contains(void* key);
+bool dict_contains(dict_t dict, void* key);
 
 /**
  * @brief retrieves the value for the given key
  * 
+ * @param dict The dictionary to look in
  * @param key the key to retrieve the value for
  * @return void* Returns the value corresponding to the key or NULL if the key does not exist
  */
-void* dict_get(void* key);
+void* dict_get(dict_t dict, void* key);
 
 /**
  * @brief Inserts or replaces the given value into the dictionary with the given key
  * 
+ * @param dict The dictionary to insert into
  * @param key The key for the value to insert
  * @param value The value to assign to the given key
  */
-void dict_put(void* key, void* value);
+void dict_put(dict_t dict, void* key, void* value);
 
 /**
  * @brief Deletes the given key from the dictionary if it exists
  * 
+ * @param dict The dictionary to remove from
  * @param key The key to delete from the dictionary
  * @return void* Returns the deleted value, or NULL if it didn't exist
  */
-void* dict_remove(void* key);
+void* dict_remove(dict_t dict, void* key);
 
 #endif

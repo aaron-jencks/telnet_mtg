@@ -9,6 +9,13 @@ arraylist_t create_arraylist(size_t capacity) {
     return arr;
 }
 
+arraylist_t* create_parraylist(size_t capacity) {
+    arraylist_t* result = (arraylist_t*)malloc(sizeof(arraylist_t));
+    handle_memory_error("arraylist.c", 13, result);
+    *result = create_arraylist(capacity);
+    return result;
+}
+
 void destroy_arraylist(arraylist_t arr) {
     if (arr.arr) free(arr.arr);
 }
@@ -16,7 +23,7 @@ void destroy_arraylist(arraylist_t arr) {
 size_t expand_arraylist(arraylist_t arr) {
     arr.capacity += 10;
     arr.arr = (void**)realloc(arr.arr, sizeof(void*) * arr.capacity);
-    handle_memory_error("arraylist.c", 20, arr.arr);
+    handle_memory_error("arraylist.c", 25, arr.arr);
     return arr.capacity;
 }
 

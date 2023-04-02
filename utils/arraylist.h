@@ -17,6 +17,13 @@ typedef struct {
 arraylist_t create_arraylist(size_t capacity);
 
 /**
+ * Creates an arraylist with the given initial capacity
+ * @param capacity the initial capacity to use.
+ * @returns Returns a pointer to a new arraylist
+*/
+arraylist_t* create_parraylist(size_t capacity);
+
+/**
  * Deallocates any memory of the given arraylist
  * @param arr the arraylist to deallocate
 */

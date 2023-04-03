@@ -4,11 +4,13 @@ SOURCES = main.c ui.c
 IO_SOURCES = io/scryfall.c io/sqlite_wrapper.c io/telnet.c io/celnet.c
 UTILS_SOURCES = utils/arraylist.c utils/cJSON.c utils/error_handler.c utils/urlencode.c utils/net.c utils/dict.c
 ENTITY_SOURCES = entities/player.c
+CONTROLLER_SOURCES = 
 ENTITY_OBJS = $(ENTITY_SOURCES:.c=.o)
 UTILS_OBJS = $(UTILS_SOURCES:.c=.o)
 IO_OBJS = $(IO_SOURCES:.c=.o)
+CONTROLLER_OBJS = $(CONTROLLER_SOURCES:.c=.o)
 MAIN_OBJS = $(SOURCES:.c=.o)
-OBJS = $(MAIN_OBJS) $(IO_OBJS) $(UTILS_OBJS) $(ENTITY_OBJS)
+OBJS = $(MAIN_OBJS) $(IO_OBJS) $(UTILS_OBJS) $(ENTITY_OBJS) $(CONTROLLER_OBJS)
 
 all: mtg_server
 
@@ -23,6 +25,9 @@ butils:.
 
 bentities:.
 	$(MAKE) -C entities
+
+bcontrollers:.
+	$(MAKE) -C controllers
 
 main.o: main.c utils/urlencode.h entities/player.h entities/entities.h io/telnet.h io/sqlite_wrapper.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<

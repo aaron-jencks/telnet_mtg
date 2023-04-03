@@ -37,7 +37,7 @@ void client_append_data(telnet_client_t* client, char* data, size_t data_len) {
 }
 
 char client_read_char(telnet_client_t* client) {
-    if (!client->pointer) return NULL;
+    if (!client->pointer) return 0;
     char c = client->buffer[0];
     for (size_t ci = 1; ci < client->pointer; ci++) {
         client->buffer[ci-1] = client->buffer[ci];
@@ -59,7 +59,7 @@ void client_reput_char(telnet_client_t* client, char c) {
 }
 
 char client_peek_char(telnet_client_t* client) {
-    if (!client->pointer) return NULL;
+    if (!client->pointer) return 0;
     return client->buffer[0];
 }
 
@@ -83,7 +83,7 @@ typedef struct {
     socklen_t addrlen;
 } disconnection_args_t;
 
-void client_disconnection_listener(void* args) {
+void* client_disconnection_listener(void* args) {
     disconnection_args_t* dargs = (disconnection_args_t*)args;
     int dret = pthread_join(dargs->cthread, NULL);
     if (dret) {
@@ -92,6 +92,7 @@ void client_disconnection_listener(void* args) {
     char* daddrstring = display_ip(dargs->addr, dargs->addrlen);
     printf("Client %s disconnected...\n", daddrstring);
     free(daddrstring);
+    return NULL;
 }
 
 void client_cleanup(pthread_t cthread, int fd, sockaddr_t* addr, socklen_t addrlen) {
@@ -100,7 +101,7 @@ void client_cleanup(pthread_t cthread, int fd, sockaddr_t* addr, socklen_t addrl
     free(daddrstring);
 
     disconnection_args_t* args = (disconnection_args_t*)malloc(sizeof(disconnection_args_t));
-    handle_memory_error("telnet.c", 102, args);
+    handle_memory_error("telnet.c", 103, args);
     args->cthread = cthread;
     args->fd = fd;
     args->addr = addr;
@@ -111,14 +112,14 @@ void client_cleanup(pthread_t cthread, int fd, sockaddr_t* addr, socklen_t addrl
 
     cret = pthread_create(&dthread, NULL, client_disconnection_listener, (void*)args);
     if (cret) {
-        error_at_line(ERR_PTHREAD, cret, "telnet.c", 112, "Failed to launch pthread, failed with code: %d", cret);
+        error_at_line(ERR_PTHREAD, cret, "telnet.c", 113, "Failed to launch pthread, failed with code: %d", cret);
     }
 }
 
 void launch_telnet_server(uint16_t port) {
     current_connections = create_dict(10, connection_hashing_function);
     if (pthread_mutex_init(&connection_lock, NULL)) {
-        error_at_line(ERR_MUTEX_INIT, 0, "telnet.c", 120, "Failed to initialize mutex for connection lock");
+        error_at_line(ERR_MUTEX_INIT, 0, "telnet.c", 121, "Failed to initialize mutex for connection lock");
     }
 
     server_def_t definition = create_server_defaults();

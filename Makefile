@@ -12,19 +12,16 @@ OBJS = $(MAIN_OBJS) $(IO_OBJS) $(UTILS_OBJS) $(ENTITY_OBJS)
 
 all: mtg_server
 
-mtg_server: $(MAIN_OBJS)
-	$(MAKE) -C io
-	$(MAKE) -C utils
-	$(MAKE) -C entities
+mtg_server: bio butils bentities $(MAIN_OBJS)
 	$(CC) -o $@ $(HTTPS_DIR)/https.o $(OBJS) $(LDFLAGS) $(LIBS)
 
-io:.
+bio:.
 	$(MAKE) -C io
 
-utils:.
+butils:.
 	$(MAKE) -C utils
 
-entities:.
+bentities:.
 	$(MAKE) -C entities
 
 main.o: main.c utils/urlencode.h entities/player.h entities/entities.h io/telnet.h io/sqlite_wrapper.h

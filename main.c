@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "utils/urlencode.h"
 #include "io/sqlite_wrapper.h"
+#include "io/telnet.h"
 #include "entities/entities.h"
 #include "entities/player.h"
 #include "ui.h"
 
 int main(int argc, char *argv[]) {
+    // Setup the database tables
     create_tables();
     url_encoder_rfc_tables_init();
+
+    // Create a seed player
     player_t p;
     if (!player_exists("iggy12345")) {
         printf("The player did not exist!\n");
@@ -18,5 +23,8 @@ int main(int argc, char *argv[]) {
         p = retrieve_player("iggy12345");
         printf("Player:\n\tName: %s\n\tPassword: %s\n", p.username, p.password);
     }
+
+    // Start the telnet listener
+    launch_telnet_server(23);
     return 0;
 }

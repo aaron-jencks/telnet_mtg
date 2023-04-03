@@ -16,7 +16,7 @@ scryfall.o: scryfall.c scryfall.h https_make ../utils/cJSON.h ../utils/error_han
 sqlite_wrapper.o: sqlite_wrapper.c sqlite_wrapper.h ../entities/entities.h ../utils/error_handler.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
-telnet.o: telnet.c telnet.h celnet.h ../utils/dict.h ../utils/error_handler.h
+telnet.o: telnet.c telnet.h celnet.h ../utils/dict.h ../utils/error_handler.h ../utils/net.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 .c.o:

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <error.h>
+#include <stdlib.h>
 
 #include "dict.h"
 #include "error_handler.h"
@@ -58,7 +59,7 @@ void dict_put(dict_t* dict, void* key, void* value) {
         }
     }
     key_value_pair_t* kvp = (key_value_pair_t*)malloc(sizeof(key_value_pair_t));
-    handle_memory_error("dict.c", 60, kvp);
+    handle_memory_error("dict.c", 61, kvp);
     kvp->key = key;
     kvp->value = value;
     arraylist_append(*b, kvp);
@@ -100,7 +101,7 @@ arraylist_t dict_to_list(dict_t dict, bool empty) {
 
 void dict_resize(dict_t dict, size_t new_size) {
     if (new_size <= dict.bins.count) {
-        error_at_line(ERR_DICT_SIZE, 0, "dict.c", 102, "New dict size must be larger than previous size");
+        error_at_line(ERR_DICT_SIZE, 0, "dict.c", 103, "New dict size must be larger than previous size");
     }
 
     // Empty the dict

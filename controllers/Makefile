@@ -5,7 +5,7 @@ OBJS = $(SOURCES:.c=.o)
 
 all: $(OBJS)
 
-parsing.o: parsing.c parsing.h ../utils/dict.h ../utils/error_handler.h
+parsing.o: parsing.c parsing.h ../utils/dict.h ../utils/error_handler.h ../utils/hashing.h ../io/celnet.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 .c.o:

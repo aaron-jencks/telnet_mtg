@@ -8,6 +8,7 @@
 #include "celnet.h"
 #include "../utils/error_handler.h"
 #include "../utils/net.h"
+#include "../controllers/parsing.h"
 
 size_t connection_hashing_function(void* key) {
     sockaddr_t* addr = (sockaddr_t*)key;
@@ -63,16 +64,39 @@ char client_peek_char(telnet_client_t* client) {
     return client->buffer[0];
 }
 
+void client_pop_count(telnet_client_t* client, size_t num) {
+    if (num) {
+        if (num < client->pointer) {
+            client->pointer -= num;
+        } else {
+            client->pointer = 0;
+        }
+    }
+}
+
+char* client_buffer_string(telnet_client_t* client) {
+    char* result = (char*)malloc(sizeof(char)*(client->pointer+1));
+    handle_memory_error("telnet.c", 68, result);
+    result = strncpy(result, client->buffer, client->pointer);
+    result[client->pointer] = 0;
+    return result;
+}
+
 void telnet_connection_handler(int fd, sockaddr_t* addr, socklen_t len, char* data, size_t data_len) {
     pthread_mutex_lock(&connection_lock);
+    telnet_client_t* client;
     if (!dict_contains(current_connections, (void*)addr)) {
-        telnet_client_t* client = create_client(1024);
+        client = create_client(1024);
         client_append_data(client, data, data_len);
         dict_put(&current_connections, (void*)addr, (void*)client);
     } else {
-        telnet_client_t* client = (telnet_client_t*)dict_get(current_connections, (void*)addr);
+        client = (telnet_client_t*)dict_get(current_connections, (void*)addr);
         client_append_data(client, data, data_len);
     }
+    char* cbuff = client_buffer_string(client);
+    size_t bused = parse_client_buffer(fd, addr, len, cbuff, strlen(cbuff));
+    free(cbuff);
+    client_pop_count(client, bused);
     pthread_mutex_unlock(&connection_lock);
 }
 

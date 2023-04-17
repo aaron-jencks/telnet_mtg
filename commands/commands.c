@@ -16,6 +16,7 @@ void setup_commands() {
 }
 
 void command_search_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* data, size_t data_len) {
+    // TODO figure out why it's not working
     card_search_result_t sr = scryfall_search(data);
     for (size_t ci = 0; ci < sr.len; ci++) {
         char* line = display_card(&sr.cards[ci]);

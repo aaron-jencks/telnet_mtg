@@ -20,9 +20,9 @@ pthread_mutex_t connection_lock;
 
 telnet_client_t* create_client(size_t buff_size) {
     telnet_client_t* client = (telnet_client_t*)malloc(sizeof(telnet_client_t));
-    handle_memory_error("telnet.c", 21, client);
+    handle_memory_error("telnet.c", 22, client);
     client->buffer = (char*)malloc(sizeof(char)*buff_size);
-    handle_memory_error("telnet.c", 23, client->buffer);
+    handle_memory_error("telnet.c", 24, client->buffer);
     client->pointer = 0;
     client->capacity = buff_size;
     return client;
@@ -31,10 +31,11 @@ telnet_client_t* create_client(size_t buff_size) {
 void client_append_data(telnet_client_t* client, char* data, size_t data_len) {
     if (client->pointer + data_len > client->capacity) {
         client->buffer = (char*)realloc((void*)client->buffer, sizeof(char) * (client->capacity + data_len + 10));
-        handle_memory_error("telnet.c", 32, client->buffer);
+        handle_memory_error("telnet.c", 33, client->buffer);
         client->capacity += data_len + 10;
     }
     memcpy((void*)(client->buffer + client->pointer), (void*)data, data_len);
+    client->pointer += data_len;
 }
 
 char client_read_char(telnet_client_t* client) {
@@ -50,7 +51,7 @@ char client_read_char(telnet_client_t* client) {
 void client_reput_char(telnet_client_t* client, char c) {
     if (client->pointer + 1 > client->capacity) {
         client->buffer = (char*)realloc((void*)client->buffer, sizeof(char) * (client->capacity + 11));
-        handle_memory_error("telnet.c", 51, client->buffer);
+        handle_memory_error("telnet.c", 53, client->buffer);
         client->capacity += 11;
     }
     for (size_t ci = client->pointer++; ci > 0; ci--) {
@@ -76,8 +77,8 @@ void client_pop_count(telnet_client_t* client, size_t num) {
 
 char* client_buffer_string(telnet_client_t* client) {
     char* result = (char*)malloc(sizeof(char)*(client->pointer+1));
-    handle_memory_error("telnet.c", 68, result);
-    result = strncpy(result, client->buffer, client->pointer);
+    handle_memory_error("telnet.c", 79, result);
+    result = memcpy(result, client->buffer, client->pointer);
     result[client->pointer] = 0;
     return result;
 }
@@ -111,7 +112,7 @@ void* client_disconnection_listener(void* args) {
     disconnection_args_t* dargs = (disconnection_args_t*)args;
     int dret = pthread_join(dargs->cthread, NULL);
     if (dret) {
-        error_at_line(ERR_PTHREAD, dret, "telnet.c", 88, "Failed to join client thread, failed with code: %d", dret);
+        error_at_line(ERR_PTHREAD, dret, "telnet.c", 113, "Failed to join client thread, failed with code: %d", dret);
     }
     char* daddrstring = display_ip(dargs->addr, dargs->addrlen);
     printf("Client %s disconnected...\n", daddrstring);
@@ -125,7 +126,7 @@ void client_cleanup(pthread_t cthread, int fd, sockaddr_t* addr, socklen_t addrl
     free(daddrstring);
 
     disconnection_args_t* args = (disconnection_args_t*)malloc(sizeof(disconnection_args_t));
-    handle_memory_error("telnet.c", 103, args);
+    handle_memory_error("telnet.c", 128, args);
     args->cthread = cthread;
     args->fd = fd;
     args->addr = addr;
@@ -136,14 +137,14 @@ void client_cleanup(pthread_t cthread, int fd, sockaddr_t* addr, socklen_t addrl
 
     cret = pthread_create(&dthread, NULL, client_disconnection_listener, (void*)args);
     if (cret) {
-        error_at_line(ERR_PTHREAD, cret, "telnet.c", 113, "Failed to launch pthread, failed with code: %d", cret);
+        error_at_line(ERR_PTHREAD, cret, "telnet.c", 138, "Failed to launch pthread, failed with code: %d", cret);
     }
 }
 
 void launch_telnet_server(uint16_t port) {
     current_connections = create_dict(10, connection_hashing_function);
     if (pthread_mutex_init(&connection_lock, NULL)) {
-        error_at_line(ERR_MUTEX_INIT, 0, "telnet.c", 121, "Failed to initialize mutex for connection lock");
+        error_at_line(ERR_MUTEX_INIT, 0, "telnet.c", 146, "Failed to initialize mutex for connection lock");
     }
 
     server_def_t definition = create_server_defaults();

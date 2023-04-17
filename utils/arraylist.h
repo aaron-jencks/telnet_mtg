@@ -36,7 +36,7 @@ void destroy_arraylist(arraylist_t arr);
  * @param data the value to append to the end of the list
  * @returns Returns the new size of the arraylist.
 */
-size_t arraylist_append(arraylist_t arr, void* data);
+size_t arraylist_append(arraylist_t* arr, void* data);
 
 /**
  * Retrieves the value at the given index of the arraylist
@@ -52,7 +52,7 @@ void* arraylist_index(arraylist_t arr, size_t index);
  * @param arr The array to pop the elemtn off of
  * @returns Returns the value that was popped off, or NULL if the previous count was 0.
 */
-void* arraylist_pop(arraylist_t arr);
+void* arraylist_pop(arraylist_t* arr);
 
 /**
  * Removes the value at the given index
@@ -60,7 +60,7 @@ void* arraylist_pop(arraylist_t arr);
  * @param index the index to remove the value from
  * @returns Returns the removed value, or NULL if the index was out of bounds
 */
-void* arraylist_remove(arraylist_t arr, size_t index);
+void* arraylist_remove(arraylist_t* arr, size_t index);
 
 /**
  * Inserts a new value in the arraylist at the given index
@@ -70,14 +70,14 @@ void* arraylist_remove(arraylist_t arr, size_t index);
  * @returns Returns the new size of the array, 
  * in the case that the index is out of bounds, then the size will not change.
 */
-size_t arraylist_insert(arraylist_t arr, size_t index, void* value);
+size_t arraylist_insert(arraylist_t* arr, size_t index, void* value);
 
 /**
  * Removes the first element of the array
  * @param arr the array to dequeue the element from
  * @returns Returns the dequeued element, or NULL if the size of the arraylist was 0
 */
-void* arraylist_dequeue(arraylist_t arr);
+void* arraylist_dequeue(arraylist_t* arr);
 
 /**
  * Returns the number of elements in the arraylist,

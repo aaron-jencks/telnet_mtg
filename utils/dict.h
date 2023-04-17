@@ -21,7 +21,7 @@ typedef struct {
 } key_value_pair_t;
 
 typedef struct {
-    arraylist_t bins;
+    arraylist_t* bins;
     hashing_function hash_function;
     comparator key_comparing_func;
     size_t count;

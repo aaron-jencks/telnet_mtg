@@ -10,7 +10,7 @@ all: https_make $(OBJS)
 https_make:
 	$(MAKE) -C $(HTTPS_DIR) mbedtls_make https.o
 
-scryfall.o: scryfall.c scryfall.h https_make ../utils/cJSON.h ../utils/error_handler.h ../utils/urlencode.h
+scryfall.o: scryfall.c scryfall.h https_make ../utils/cJSON.h ../utils/error_handler.h ../utils/urlencode.h ../utils/arraylist.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 sqlite_wrapper.o: sqlite_wrapper.c sqlite_wrapper.h ../entities/entities.h ../utils/error_handler.h

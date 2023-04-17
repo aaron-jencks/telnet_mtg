@@ -3,10 +3,12 @@
 #include "../utils/cJSON.h"
 #include "../utils/urlencode.h"
 #include "../utils/error_handler.h"
+#include "../utils/arraylist.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <error.h>
+#include <math.h>
 
 const char* MTG_SDK_HOST = "https://api.scryfall.com";
 const int RESPONSE_BUFFER_SIZE = 8192;
@@ -16,7 +18,7 @@ api_response_t api_json_response(char* url) {
     int current_buff_size = RESPONSE_BUFFER_SIZE, ret;
 
     char* response = malloc(current_buff_size * sizeof(char));
-    handle_memory_error("scryfall.c", 16, response);
+    handle_memory_error("scryfall.c", 20, response);
 
     HTTP_INFO hi;
 
@@ -27,7 +29,7 @@ api_response_t api_json_response(char* url) {
             // We have an incomplete response
             current_buff_size = hi.response.content_length;
             response = realloc(response, sizeof(char) * current_buff_size);
-            handle_memory_error("scryfall.c", 28, response);
+            handle_memory_error("scryfall.c", 31, response);
             continue;
         }
         break;
@@ -47,9 +49,17 @@ char* parse_json_for_string(cJSON* item, char* name) {
         return NULL;
     }
     char* temp = calloc(strlen(stritem->valuestring)+1, sizeof(char));
-    handle_memory_error("scryfall.c", 48, temp);
+    handle_memory_error("scryfall.c", 51, temp);
     temp = strcpy(temp, stritem->valuestring);
     return temp;
+}
+
+double parse_json_for_number(cJSON* item, char* name) {
+    cJSON* stritem = cJSON_GetObjectItemCaseSensitive(item, name);
+    if (stritem == NULL || !(cJSON_IsNumber(stritem) && stritem->valuestring != NULL)) {
+        return sqrt(-1.0);
+    }
+    return cJSON_GetNumberValue(stritem);
 }
 
 card_t init_card() {
@@ -57,12 +67,86 @@ card_t init_card() {
     return result;
 }
 
+card_t parse_card_json(cJSON* json) {
+    card_t cresponse = init_card();
+
+    if (!json) {
+        return cresponse;
+    }
+
+    char* strings[] = {
+        "id",
+        "name",
+        "mana_cost",
+        "type_line",
+        "oracle_text",
+        "power",
+        "toughness",
+        "loyalty"
+    };
+
+    char** props[] = {
+        &cresponse.id,
+        &cresponse.name,
+        &cresponse.manacost,
+        &cresponse.type,
+        &cresponse.text,
+        &cresponse.power,
+        &cresponse.toughness,
+        &cresponse.loyalty
+    };
+
+    char* temp;
+
+    for (int i = 0; i < 8; i++) {
+        temp = parse_json_for_string(json, strings[i]);
+        *(props[i]) = temp;
+    }
+
+    cJSON* faces = cJSON_GetObjectItemCaseSensitive(json, "card_faces");
+    if (faces) {
+        cJSON* face;
+        size_t face_count = 0;
+        cJSON_ArrayForEach(face, faces) face_count++;
+        cresponse.faces = malloc(sizeof(card_t*)*(face_count+1));
+        handle_memory_error("scryfall.c", 111, cresponse.faces);
+        if (!cresponse.faces) {
+            return cresponse;
+        }
+        cresponse.faces[face_count] = NULL;
+
+        size_t findex = 0;
+        cJSON_ArrayForEach(face, faces) {
+            card_t* fst = malloc(sizeof(card_t));
+            handle_memory_error("scryfall.c", 120, fst);
+            char** fprops[] = {
+                &fst->name,
+                &fst->manacost,
+                &fst->type,
+                &fst->text,
+                &fst->power,
+                &fst->toughness,
+                &fst->loyalty
+            };
+
+            for (int i = 1; i < 8; i++) {
+                temp = parse_json_for_string(json, strings[i]);
+                *(fprops[i-1]) = temp;
+            }
+
+            cresponse.faces[findex++] = fst;
+        }
+    }
+
+    return cresponse;
+}
+
 card_t find_card(char* name) {
     char* encoded_name = calloc((3 * strlen(name) + 1), sizeof(char));
-    handle_memory_error("scryfall.c", 60, encoded_name);
+    handle_memory_error("scryfall.c", 145, encoded_name);
     url_encode(html5, name, encoded_name);
     char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(encoded_name) + 20));
-    handle_memory_error("scryfall.c", 63, sbuffer);
+    handle_memory_error("scryfall.c", 148, sbuffer);
     sprintf(sbuffer, "%s/cards/named?exact=%s", MTG_SDK_HOST, encoded_name);
     api_response_t response = api_json_response(sbuffer);
     free(encoded_name);
@@ -73,83 +157,61 @@ card_t find_card(char* name) {
     if (response.http_code == 200) {
         cJSON* json = cJSON_Parse(response.response);
 
-        if (!json) {
-            return cresponse;
-        }
+        cresponse = parse_card_json(json);
 
-        char* strings[] = {
-            "id",
-            "name",
-            "mana_cost",
-            "type_line",
-            "oracle_text",
-            "power",
-            "toughness",
-            "loyalty"
-        };
+        cJSON_Delete(json);
+    } else {
+        error_at_line(ERR_SCRYFALL, ERR_SCRYFALL, "scryfall.c", 151, "Scryfall server responded with: %d\n%s", response.http_code, response.response);
+    }
+    
+    return cresponse;
+}
 
-        char** props[] = {
-            &cresponse.id,
-            &cresponse.name,
-            &cresponse.manacost,
-            &cresponse.type,
-            &cresponse.text,
-            &cresponse.power,
-            &cresponse.toughness,
-            &cresponse.loyalty
-        };
+card_search_result_t scryfall_search(char* keyword) {
+    char* encoded_keyword = calloc((3 * strlen(keyword) + 1), sizeof(char));
+    handle_memory_error("scryfall.c", 171, encoded_keyword);
+    url_encode(html5, keyword, encoded_keyword);
+    char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(encoded_keyword) + 20));
+    handle_memory_error("scryfall.c", 174, sbuffer);
+    sprintf(sbuffer, "%s/cards/search?q=%s", MTG_SDK_HOST, encoded_keyword);
+    api_response_t response = api_json_response(sbuffer);
+    free(encoded_keyword);
+    free(sbuffer);
 
-        char* temp;
+    card_t* result_buff = (card_t*)malloc(sizeof(card_t)*10);
+    handle_memory_error("scryfall.c", 181, result_buff);
+    size_t result_buff_index = 0;
 
-        for (int i = 0; i < 8; i++) {
-            temp = parse_json_for_string(json, strings[i]);
-            *(props[i]) = temp;
-        }
+    if (response.http_code == 200) {
+        cJSON* json = cJSON_Parse(response.response);
 
-        cJSON* faces = cJSON_GetObjectItemCaseSensitive(json, "card_faces");
-        if (faces) {
-            cJSON* face;
-            size_t face_count = 0;
-            cJSON_ArrayForEach(face, faces) face_count++;
-            cresponse.faces = malloc(sizeof(card_t*)*(face_count+1));
-            handle_memory_error("scryfall.c", 113, cresponse.faces);
-            if (!cresponse.faces) {
-                free(response.response);
-                return cresponse;
-            }
-            cresponse.faces[face_count] = NULL;
+        if (!json) return (card_search_result_t){NULL, 0};
 
-            size_t findex = 0;
-            cJSON_ArrayForEach(face, faces) {
-                card_t* fst = malloc(sizeof(card_t));
-                handle_memory_error("scryfall.c", 123, fst);
-                char** fprops[] = {
-                    &fst->name,
-                    &fst->manacost,
-                    &fst->type,
-                    &fst->text,
-                    &fst->power,
-                    &fst->toughness,
-                    &fst->loyalty
-                };
+        double card_count_d = parse_json_for_number(json, "total_cards");
+        cJSON* data = cJSON_GetObjectItemCaseSensitive(json, "data");
 
-                for (int i = 1; i < 8; i++) {
-                    temp = parse_json_for_string(json, strings[i]);
-                    *(fprops[i-1]) = temp;
-                }
+        if (!data) return (card_search_result_t){NULL, 0};
 
-                cresponse.faces[findex++] = fst;
-            }
+        for (size_t card_i = 0; card_i < ((card_count_d > 10) ? 10 : (size_t)card_count_d); card_i++) {
+            card_t cresponse = init_card();
+
+            cJSON* arr_item = cJSON_GetArrayItem(data, card_i);
+            cresponse = parse_card_json(arr_item);
+
+            result_buff[result_buff_index++] = cresponse;
         }
 
         cJSON_Delete(json);
     } else {
-        error_at_line(3, ERR_SCRYFALL, "scryfall.c", 66, "Scryfall server responded with: %d\n%s", response.http_code, response.response);
+        error_at_line(ERR_SCRYFALL, ERR_SCRYFALL, "scryfall.c", 176, "Scryfall server responded with: %d\n%s", response.http_code, response.response);
     }
 
     free(response.response);
     
-    return cresponse;
+    return (card_search_result_t){
+        result_buff,
+        result_buff_index
+    };
 }
 
 void delete_card(card_t card) {
@@ -224,14 +286,14 @@ char* display_card(card_t* card) {
     if (power && toughness) {
         tsize += strlen(pttemplate) + 1;
         finaltemplate = malloc(sizeof(char) * tsize);
-        handle_memory_error("scryfall.c", 223, finaltemplate);
+        handle_memory_error("scryfall.c", 288, finaltemplate);
         finaltemplate[tsize-1] = 0;
         sprintf(finaltemplate, "%s\n%s", template, pttemplate);
         tlen += 4;
     } else if (loyalty) {
         tsize += strlen(ltemplate) + 1;
         finaltemplate = malloc(sizeof(char) * tsize);
-        handle_memory_error("scryfall.c", 230, finaltemplate);
+        handle_memory_error("scryfall.c", 295, finaltemplate);
         finaltemplate[tsize-1] = 0;
         sprintf(finaltemplate, "%s\n%s", template, ltemplate);
         tlen += 3;
@@ -241,7 +303,7 @@ char* display_card(card_t* card) {
     }
 
     char* result = malloc(sizeof(char) * tlen);
-    handle_memory_error("scryfall.c", 240, result);
+    handle_memory_error("scryfall.c", 305, result);
     result[tlen-1]=0;
 
     if (power && toughness) {

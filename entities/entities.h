@@ -18,4 +18,9 @@ typedef struct {
     deck_entry_t* entries;
 } deck_t;
 
+typedef struct {
+    char* room_name;
+    int player_max;
+} room_t;
+
 #endif

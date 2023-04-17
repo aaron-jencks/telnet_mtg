@@ -19,7 +19,7 @@ typedef struct {
     /**
      * A function for interacting with the window
     */
-    interaction_response_t (*interact)();
+    interaction_response_t (*interact)(char*);
 } window_t;
 
 /**

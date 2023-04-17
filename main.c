@@ -7,12 +7,19 @@
 #include "io/telnet.h"
 #include "entities/entities.h"
 #include "entities/player.h"
-#include "ui.h"
+#include "commands/commands.h"
+#include "controllers/parsing.h"
 
 int main(int argc, char *argv[]) {
     // Setup the database tables
     create_tables();
+    
+    // setup encoder
     url_encoder_rfc_tables_init();
+
+    // setup command handlers
+    setup_handler_map();
+    setup_commands();
 
     // Create a seed player
     player_t p;

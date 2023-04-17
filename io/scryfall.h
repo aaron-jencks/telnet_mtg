@@ -26,6 +26,11 @@ typedef struct {
 
 } card_t;
 
+typedef struct {
+    card_t* cards;
+    size_t len;
+} card_search_result_t;
+
 /**
  * Fetches the response from the api and returns it's content if any
  * @param url The url to send to the api
@@ -39,6 +44,14 @@ api_response_t api_json_response(char* url);
  * @returns a struct representing the desired card, or NULL if not found
 */
 card_t find_card(char* name);
+
+/**
+ * @brief Fetches a list of cards from the api that are similar to the supplied keyword
+ * 
+ * @param keyword They keyword to look for
+ * @return card_t* A zero-terminated list of cards
+ */
+card_search_result_t scryfall_search(char* keyword);
 
 /**
  * Creates a new card with all of the pointers set to NULL

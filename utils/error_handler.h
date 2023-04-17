@@ -9,5 +9,6 @@ extern const int ERR_MUTEX_INIT;
 extern const int ERR_PTHREAD;
 
 void handle_memory_error(const char* filename, unsigned int linenum, const void* const ptr);
+void handle_socket_write_error(const char* filename, unsigned int linenum);
 
 #endif

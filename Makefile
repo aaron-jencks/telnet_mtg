@@ -1,10 +1,10 @@
 include ./Makefile.variable
 
-SOURCES = main.c ui.c
+SOURCES = main.c commands/commands.c
 IO_SOURCES = io/scryfall.c io/sqlite_wrapper.c io/telnet.c io/celnet.c
 UTILS_SOURCES = utils/arraylist.c utils/cJSON.c utils/error_handler.c utils/urlencode.c utils/net.c utils/dict.c utils/hashing.c
 ENTITY_SOURCES = entities/player.c
-CONTROLLER_SOURCES = controllers/parsing.c
+CONTROLLER_SOURCES = controllers/parsing.c controllers/comm.c
 ENTITY_OBJS = $(ENTITY_SOURCES:.c=.o)
 UTILS_OBJS = $(UTILS_SOURCES:.c=.o)
 IO_OBJS = $(IO_SOURCES:.c=.o)
@@ -33,6 +33,9 @@ main.o: main.c utils/urlencode.h entities/player.h entities/entities.h io/telnet
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 ui.o: ui.c ui.h utils/arraylist.h utils/error_handler.h
+	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
+
+commands/commands.o: commands/commands.c commands/commands.h io/celnet.h io/scryfall.h controllers/comm.h controllers/parsing.h utils/dict.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 .c.o:

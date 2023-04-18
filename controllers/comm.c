@@ -7,7 +7,7 @@
 #include "../utils/error_handler.h"
 
 void comm_write_message(int fd, char* message) {
-    if(send(fd, message, strlen(message), 0)) {
-        handle_socket_write_error("comm.c", 9);
+    if(send(fd, message, strlen(message), 0) < 0) {
+        handle_socket_write_error("comm.c", 10);
     }
 }

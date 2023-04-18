@@ -23,7 +23,7 @@ typedef void (*command_handler)(int, sockaddr_t*, socklen_t, char*, size_t);
 
 extern dict_t command_handler_map;
 extern pthread_mutex_t command_mutex;
-extern char command_delimiter;
+extern char* command_delimiter;
 extern char* command_arg_delimiter;
 
 /**

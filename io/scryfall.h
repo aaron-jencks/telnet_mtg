@@ -43,7 +43,7 @@ api_response_t api_json_response(char* url);
  * @param name The name of the card to search for
  * @returns a struct representing the desired card, or NULL if not found
 */
-card_t find_card(char* name);
+card_t scryfall_find(char* name);
 
 /**
  * @brief Fetches a list of cards from the api that are similar to the supplied keyword

@@ -2,7 +2,7 @@ include ./Makefile.variable
 
 SOURCES = main.c commands/commands.c
 IO_SOURCES = io/scryfall.c io/sqlite_wrapper.c io/telnet.c io/celnet.c
-UTILS_SOURCES = utils/arraylist.c utils/cJSON.c utils/error_handler.c utils/urlencode.c utils/net.c utils/dict.c utils/hashing.c
+UTILS_SOURCES = utils/arraylist.c utils/cJSON.c utils/error_handler.c utils/urlencode.c utils/net.c utils/dict.c utils/hashing.c utils/strings.c
 ENTITY_SOURCES = entities/player.c
 CONTROLLER_SOURCES = controllers/parsing.c controllers/comm.c
 ENTITY_OBJS = $(ENTITY_SOURCES:.c=.o)

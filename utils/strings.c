@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "error_handler.h"
 
@@ -25,7 +26,7 @@ char* strreplace(char* s, char* delim, char* sub) {
     size_t ncount = scount + count * (sucount - 1) + 1;
 
     char* returnValue = malloc(sizeof(char) * ncount);
-    handle_memory_error("strings.c", 25, returnValue);
+    handle_memory_error("strings.c", 28, returnValue);
     returnValue[ncount-1] = 0;
 
     size_t soffset = 0;

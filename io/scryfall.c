@@ -4,6 +4,7 @@
 #include "../utils/urlencode.h"
 #include "../utils/error_handler.h"
 #include "../utils/arraylist.h"
+#include "../utils/strings.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,7 +19,7 @@ api_response_t api_json_response(char* url) {
     int current_buff_size = RESPONSE_BUFFER_SIZE, ret;
 
     char* response = malloc((current_buff_size + 1) * sizeof(char));
-    handle_memory_error("scryfall.c", 20, response);
+    handle_memory_error("scryfall.c", 21, response);
 
     HTTP_INFO hi;
 
@@ -30,7 +31,7 @@ api_response_t api_json_response(char* url) {
             // We have an incomplete response
             current_buff_size = hi.response.content_length + 1;
             response = realloc(response, sizeof(char) * (current_buff_size + 1));
-            handle_memory_error("scryfall.c", 32, response);
+            handle_memory_error("scryfall.c", 33, response);
             continue;
         }
         break;
@@ -50,8 +51,8 @@ char* parse_json_for_string(cJSON* item, char* name) {
         return NULL;
     }
     char* temp = calloc(strlen(stritem->valuestring)+1, sizeof(char));
-    handle_memory_error("scryfall.c", 52, temp);
-    temp = strcpy(temp, stritem->valuestring);
+    handle_memory_error("scryfall.c", 53, temp);
+    temp = strreplace(stritem->valuestring, "\n", "\r\n");
     return temp;
 }
 
@@ -107,7 +108,7 @@ card_t parse_card_json(cJSON* json) {
         size_t face_count = 0;
         cJSON_ArrayForEach(face, faces) face_count++;
         cresponse.faces = malloc(sizeof(card_t*)*(face_count+1));
-        handle_memory_error("scryfall.c", 109, cresponse.faces);
+        handle_memory_error("scryfall.c", 110, cresponse.faces);
         if (!cresponse.faces) {
             return cresponse;
         }
@@ -116,7 +117,7 @@ card_t parse_card_json(cJSON* json) {
         size_t findex = 0;
         cJSON_ArrayForEach(face, faces) {
             card_t* fst = malloc(sizeof(card_t));
-            handle_memory_error("scryfall.c", 118, fst);
+            handle_memory_error("scryfall.c", 119, fst);
             char** fprops[] = {
                 &fst->name,
                 &fst->manacost,
@@ -141,10 +142,10 @@ card_t parse_card_json(cJSON* json) {
 
 card_t scryfall_find(char* name) {
     char* encoded_name = calloc((3 * strlen(name) + 1), sizeof(char));
-    handle_memory_error("scryfall.c", 143, encoded_name);
+    handle_memory_error("scryfall.c", 144, encoded_name);
     url_encode(html5, name, encoded_name);
     char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(encoded_name) + 20));
-    handle_memory_error("scryfall.c", 146, sbuffer);
+    handle_memory_error("scryfall.c", 147, sbuffer);
     sprintf(sbuffer, "%s/cards/named?exact=%s", MTG_SDK_HOST, encoded_name);
     api_response_t response = api_json_response(sbuffer);
     free(encoded_name);
@@ -159,7 +160,7 @@ card_t scryfall_find(char* name) {
 
         cJSON_Delete(json);
     } else {
-        error_at_line(ERR_SCRYFALL, ERR_SCRYFALL, "scryfall.c", 149, "Scryfall server responded with: %d\n%s", response.http_code, response.response);
+        error_at_line(ERR_SCRYFALL, ERR_SCRYFALL, "scryfall.c", 150, "Scryfall server responded with: %d\n%s", response.http_code, response.response);
     }
     
     return cresponse;
@@ -167,17 +168,17 @@ card_t scryfall_find(char* name) {
 
 card_search_result_t scryfall_search(char* keyword) {
     char* encoded_keyword = calloc((3 * strlen(keyword) + 1), sizeof(char));
-    handle_memory_error("scryfall.c", 169, encoded_keyword);
+    handle_memory_error("scryfall.c", 170, encoded_keyword);
     url_encode(html5, keyword, encoded_keyword);
     char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(encoded_keyword) + 20));
-    handle_memory_error("scryfall.c", 172, sbuffer);
+    handle_memory_error("scryfall.c", 173, sbuffer);
     sprintf(sbuffer, "%s/cards/search?q=%s", MTG_SDK_HOST, encoded_keyword);
     api_response_t response = api_json_response(sbuffer);
     free(encoded_keyword);
     free(sbuffer);
 
     card_t* result_buff = (card_t*)malloc(sizeof(card_t)*10);
-    handle_memory_error("scryfall.c", 179, result_buff);
+    handle_memory_error("scryfall.c", 180, result_buff);
     size_t result_buff_index = 0;
 
     if (response.http_code == 200) {
@@ -202,7 +203,7 @@ card_search_result_t scryfall_search(char* keyword) {
 
         cJSON_Delete(json);
     } else {
-        error_at_line(ERR_SCRYFALL, ERR_SCRYFALL, "scryfall.c", 175, "Scryfall server responded with: %d\n%s", response.http_code, response.response);
+        error_at_line(ERR_SCRYFALL, ERR_SCRYFALL, "scryfall.c", 176, "Scryfall server responded with: %d\n%s", response.http_code, response.response);
     }
 
     free(response.response);
@@ -285,14 +286,14 @@ char* display_card(card_t* card) {
     if (power && toughness) {
         tsize += strlen(pttemplate) + 2;
         finaltemplate = malloc(sizeof(char) * tsize);
-        handle_memory_error("scryfall.c", 287, finaltemplate);
+        handle_memory_error("scryfall.c", 288, finaltemplate);
         finaltemplate[tsize-1] = 0;
         sprintf(finaltemplate, "%s\r\n%s", template, pttemplate);
         tlen += 4;
     } else if (loyalty) {
         tsize += strlen(ltemplate) + 2;
         finaltemplate = malloc(sizeof(char) * tsize);
-        handle_memory_error("scryfall.c", 294, finaltemplate);
+        handle_memory_error("scryfall.c", 295, finaltemplate);
         finaltemplate[tsize-1] = 0;
         sprintf(finaltemplate, "%s\r\n%s", template, ltemplate);
         tlen += 3;
@@ -302,7 +303,7 @@ char* display_card(card_t* card) {
     }
 
     char* result = malloc(sizeof(char) * tlen);
-    handle_memory_error("scryfall.c", 304, result);
+    handle_memory_error("scryfall.c", 305, result);
     result[tlen-1]=0;
 
     if (power && toughness) {

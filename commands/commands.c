@@ -20,7 +20,7 @@ void setup_commands() {
 }
 
 void command_search_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* data, size_t data_len) {
-    // TODO figure out why it's not working
+    // TODO corrupted size issue here
     printf("Searching for %s\n", data);
     card_search_result_t sr = scryfall_search(data);
     if (sr.len) {
@@ -40,7 +40,6 @@ void command_search_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* dat
 }
 
 void command_info_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* data, size_t data_len) {
-    // TODO figure out why it's not working
     printf("Searching for %s\n", data);
     card_t sr = scryfall_find(data);
     char* line = display_card(&sr);

@@ -283,14 +283,14 @@ char* display_card(card_t* card) {
     char allocd = 1;
     size_t tsize = strlen(template) + 1;
     if (power && toughness) {
-        tsize += strlen(pttemplate) + 1;
+        tsize += strlen(pttemplate) + 2;
         finaltemplate = malloc(sizeof(char) * tsize);
         handle_memory_error("scryfall.c", 287, finaltemplate);
         finaltemplate[tsize-1] = 0;
         sprintf(finaltemplate, "%s\r\n%s", template, pttemplate);
         tlen += 4;
     } else if (loyalty) {
-        tsize += strlen(ltemplate) + 1;
+        tsize += strlen(ltemplate) + 2;
         finaltemplate = malloc(sizeof(char) * tsize);
         handle_memory_error("scryfall.c", 294, finaltemplate);
         finaltemplate[tsize-1] = 0;

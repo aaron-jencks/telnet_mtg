@@ -2,7 +2,7 @@ include ../Makefile.variable
 
 HTTPS_DIR = $(CURDIR)/https_client
 
-SOURCES = arraylist.c cJSON.c error_handler.c urlencode.c net.c dict.c hashing.c
+SOURCES = arraylist.c cJSON.c error_handler.c urlencode.c net.c dict.c hashing.c strings.c
 OBJS = $(SOURCES:.c=.o)
 
 all: $(OBJS)
@@ -14,6 +14,9 @@ arraylist.o: arraylist.c arraylist.h error_handler.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 net.o: net.c net.h error_handler.h
+	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
+
+strings.o: strings.c strings.h error_handler.h
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 .c.o:

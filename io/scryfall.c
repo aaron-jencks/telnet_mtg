@@ -302,9 +302,9 @@ char* display_card(card_t* card) {
         allocd = 0;
     }
 
-    char* result = malloc(sizeof(char) * tlen);
+    char* result = malloc(sizeof(char) * (tlen + 1));
     handle_memory_error("scryfall.c", 305, result);
-    result[tlen-1]=0;
+    result[tlen]=0;
 
     if (power && toughness) {
         sprintf(result, finaltemplate, name, cost, type, text ? text : "", power, toughness);

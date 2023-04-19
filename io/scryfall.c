@@ -50,9 +50,7 @@ char* parse_json_for_string(cJSON* item, char* name) {
     if (stritem == NULL || !(cJSON_IsString(stritem) && stritem->valuestring != NULL)) {
         return NULL;
     }
-    char* temp = calloc(strlen(stritem->valuestring)+1, sizeof(char));
-    handle_memory_error("scryfall.c", 53, temp);
-    temp = strreplace(stritem->valuestring, "\n", "\r\n");
+    char* temp = strreplace(stritem->valuestring, "\n", "\r\n");
     return temp;
 }
 
@@ -117,7 +115,7 @@ card_t parse_card_json(cJSON* json) {
         size_t findex = 0;
         cJSON_ArrayForEach(face, faces) {
             card_t* fst = malloc(sizeof(card_t));
-            handle_memory_error("scryfall.c", 119, fst);
+            handle_memory_error("scryfall.c", 117, fst);
             char** fprops[] = {
                 &fst->name,
                 &fst->manacost,
@@ -142,10 +140,10 @@ card_t parse_card_json(cJSON* json) {
 
 card_t scryfall_find(char* name) {
     char* encoded_name = calloc((3 * strlen(name) + 1), sizeof(char));
-    handle_memory_error("scryfall.c", 144, encoded_name);
+    handle_memory_error("scryfall.c", 142, encoded_name);
     url_encode(html5, name, encoded_name);
     char* sbuffer = malloc(sizeof(char) * (strlen(MTG_SDK_HOST) + strlen(encoded_name) + 20));
-    handle_memory_error("scryfall.c", 147, sbuffer);
+    handle_memory_error("scryfall.c", 145, sbuffer);
     sprintf(sbuffer, "%s/cards/named?exact=%s", MTG_SDK_HOST, encoded_name);
     api_response_t response = api_json_response(sbuffer);
     free(encoded_name);
@@ -160,8 +158,10 @@ card_t scryfall_find(char* name) {
 
         cJSON_Delete(json);
     } else {
-        error_at_line(ERR_SCRYFALL, ERR_SCRYFALL, "scryfall.c", 150, "Scryfall server responded with: %d\n%s", response.http_code, response.response);
+        error_at_line(ERR_SCRYFALL, ERR_SCRYFALL, "scryfall.c", 148, "Scryfall server responded with: %d\n%s", response.http_code, response.response);
     }
+
+    free(response.response);
     
     return cresponse;
 }

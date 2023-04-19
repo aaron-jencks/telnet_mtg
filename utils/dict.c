@@ -6,7 +6,7 @@
 #include "error_handler.h"
 
 int default_comparator(void* a, void* b) {
-    return (int)((int64_t)a-(int64_t)b);
+    return (int)((uintptr_t)a-(uintptr_t)b);
 }
 
 dict_t create_dict(size_t bcount, hashing_function hfunc) {

@@ -199,8 +199,8 @@ void* connection_handler(void* args) {
     if (pbuffer) free(pbuffer);
     if (rbuffer) free(rbuffer);
     free(cargs->addr);
-    free(cargs);
     shutdown(cargs->connfd, SHUT_RDWR);
+    free(cargs);
 }
 
 

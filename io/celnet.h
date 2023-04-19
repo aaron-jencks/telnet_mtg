@@ -8,7 +8,7 @@
 #include <netinet/ip.h>
 
 extern const uint8_t IAC, WILL, WONT, DO, DONT;
-extern int socketfd;
+extern int celnet_socketfd;
 
 typedef struct sockaddr_in sockaddr_t;
 

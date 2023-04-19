@@ -1,14 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+#include <sys/socket.h>
 
 #include "utils/urlencode.h"
 #include "io/sqlite_wrapper.h"
 #include "io/telnet.h"
+#include "io/celnet.h"
 #include "entities/entities.h"
 #include "entities/player.h"
 #include "commands/commands.h"
 #include "controllers/parsing.h"
+
+void catchkill(int signo) {
+    if (signo == SIGINT) {
+        shutdown(celnet_socketfd, SHUT_RDWR);
+    }
+}
 
 int main(int argc, char *argv[]) {
     // Setup the database tables

@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 const uint8_t IAC=255, WILL=251, WONT=252, DO=253, DONT=254;
-int socketfd;
+int celnet_socketfd;
 
 /**
  * A mapping of option handlers,
@@ -206,14 +206,14 @@ void* connection_handler(void* args) {
 
 void server_listen_and_serve(server_def_t definition) {
     // Initialize the socket
-    socketfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (socketfd < 0) return; // There was an error
-    if (definition.options_callback) definition.options_callback(socketfd);
-    if (bind(socketfd, (struct sockaddr*)&definition.address, sizeof(definition.address))) {
+    celnet_socketfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (celnet_socketfd < 0) return; // There was an error
+    if (definition.options_callback) definition.options_callback(celnet_socketfd);
+    if (bind(celnet_socketfd, (struct sockaddr*)&definition.address, sizeof(definition.address))) {
         printf("Failed to bind to port\n");
         return;
     }
-    if (listen(socketfd, definition.backlog)) {
+    if (listen(celnet_socketfd, definition.backlog)) {
         printf("Failed to start listening\n");
         return;
     }
@@ -226,7 +226,7 @@ void server_listen_and_serve(server_def_t definition) {
         if (!caddr) break;
         socklen_t caddr_len = sizeof(caddr);
         if (!caddr_len) break;
-        int csock = accept(socketfd, (struct sockaddr*)caddr, &caddr_len);
+        int csock = accept(celnet_socketfd, (struct sockaddr*)caddr, &caddr_len);
         if (csock < 0) {
             printf("Failed to accept socket\n");
             break;
@@ -248,6 +248,6 @@ void server_listen_and_serve(server_def_t definition) {
         if(definition.thread_handler) definition.thread_handler(cthread, csock, (struct sockaddr_in*)caddr, caddr_len);
     }
 
-    shutdown(socketfd, SHUT_RDWR); // just in case
+    shutdown(celnet_socketfd, SHUT_RDWR); // just in case
 }
 

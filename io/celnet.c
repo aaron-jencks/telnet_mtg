@@ -71,7 +71,7 @@ void* connection_handler(void* args) {
     if (!rbuffer) return NULL;
 
     for (;;) {
-        IAC_LOOP_START:
+        IAC_LOOP_START: ;
         // Get some data
         ssize_t rbuff = recv(cargs->connfd, (void*)rbuffer, sizeof(uint8_t)*cargs->buffer_size, 0);
         if (rbuff < 0) break;
@@ -193,7 +193,7 @@ void* connection_handler(void* args) {
         }
     }
 
-    EXIT_HANDLE:
+    EXIT_HANDLE: ;
     printf("Leaving handler loop\n");
     if (pbuffer) free(pbuffer);
     if (rbuffer) free(rbuffer);

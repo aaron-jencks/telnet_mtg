@@ -197,6 +197,7 @@ void* connection_handler(void* args) {
     printf("Leaving handler loop\n");
     if (pbuffer) free(pbuffer);
     if (rbuffer) free(rbuffer);
+    free(cargs);
 }
 
 

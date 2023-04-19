@@ -117,6 +117,7 @@ void* client_disconnection_listener(void* args) {
     char* daddrstring = display_ip(dargs->addr, dargs->addrlen);
     printf("Client %s disconnected...\n", daddrstring);
     free(daddrstring);
+    free(dargs->addr);
     return NULL;
 }
 

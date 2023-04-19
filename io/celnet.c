@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 const uint8_t IAC=255, WILL=251, WONT=252, DO=253, DONT=254;
@@ -47,6 +48,7 @@ typedef struct {
     sockaddr_t* addr;
     socklen_t addr_len;
     size_t buffer_size;
+    bool free;
     void (*user_connection_handler)(int, sockaddr_t*, socklen_t, char*, size_t);
 } connection_handler_args_t;
 
@@ -198,8 +200,10 @@ void* connection_handler(void* args) {
     printf("Leaving handler loop\n");
     if (pbuffer) free(pbuffer);
     if (rbuffer) free(rbuffer);
-    free(cargs->addr);
     shutdown(cargs->connfd, SHUT_RDWR);
+    if (cargs->free) {
+        free(cargs->addr);
+    }
     free(cargs);
 }
 
@@ -239,7 +243,8 @@ void server_listen_and_serve(server_def_t definition) {
 
         connection_handler_args_t* cargs = malloc(sizeof(connection_handler_args_t));
         if (!cargs) break;
-        *cargs = (connection_handler_args_t){csock, (struct sockaddr_in*)caddr, caddr_len, definition.buffer_size, definition.connection_handler};
+        *cargs = (connection_handler_args_t){csock, (struct sockaddr_in*)caddr, caddr_len, 
+            definition.buffer_size, definition.thread_handler != 0, definition.connection_handler};
 
         pthread_t cthread;
         int cret;

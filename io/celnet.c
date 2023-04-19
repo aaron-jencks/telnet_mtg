@@ -244,7 +244,7 @@ void server_listen_and_serve(server_def_t definition) {
         connection_handler_args_t* cargs = malloc(sizeof(connection_handler_args_t));
         if (!cargs) break;
         *cargs = (connection_handler_args_t){csock, (struct sockaddr_in*)caddr, caddr_len, 
-            definition.buffer_size, definition.thread_handler != 0, definition.connection_handler};
+            definition.buffer_size, !definition.thread_handler, definition.connection_handler};
 
         pthread_t cthread;
         int cret;

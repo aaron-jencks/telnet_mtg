@@ -37,7 +37,7 @@ char* display_ip(struct sockaddr_in* addr, socklen_t addrlen) {
     handle_memory_error("net.c", 36, return_value);
 
     return_value[--slen] = 0;
-    snprintf(return_value, sizeof(char)*slen, "%hhd.%hhd.%hhd.%hhd:%hd", b1, b2, b3, b4, port);
+    snprintf(return_value, sizeof(char)*slen, "%hhu.%hhu.%hhu.%hhu:%hu", b1, b2, b3, b4, port);
 
     return return_value;
 }

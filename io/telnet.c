@@ -134,7 +134,8 @@ void* client_disconnection_listener(void* args) {
     if(fdp) free(fdp);
     pthread_mutex_unlock(&connection_lock);
     free(daddrstring);
-    free(dargs->addr);
+    free(dargs->addr);\
+    printf("Freed caddr\n");
     free(dargs);
     return NULL;
 }

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/socket.h>
 
 #include "../io/scryfall.h"
 #include "../controllers/comm.h"
@@ -15,12 +16,12 @@ void setup_commands() {
 
     dict_put(&command_handler_map, "search", command_search_card);
     dict_put(&command_handler_map, "info", command_info_card);
+    dict_put(&command_handler_map, "exit", command_shutdown);
 
     pthread_mutex_unlock(&command_mutex);
 }
 
 void command_search_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* data, size_t data_len) {
-    // TODO corrupted size issue here
     printf("Searching for %s\n", data);
     card_search_result_t sr = scryfall_search(data);
     if (sr.len) {
@@ -50,4 +51,8 @@ void command_info_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* data,
     free(pbuff);
     free(line);
     delete_card(sr);
+}
+
+void command_shutdown(int fd, sockaddr_t* addr, socklen_t addr_len, char* data, size_t data_len) {
+    shutdown(fd, SHUT_RDWR);
 }

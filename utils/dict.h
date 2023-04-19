@@ -111,6 +111,6 @@ float dict_load_factor(dict_t dict);
  * @param dict the dictionary to flatten
  * @return arraylist_t returns a list of key_value_pair_t elements
  */
-arraylist_t dict_to_list(dict_t dict);
+arraylist_t dict_to_list(dict_t dict, bool empty);
 
 #endif

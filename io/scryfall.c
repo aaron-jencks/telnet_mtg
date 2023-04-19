@@ -220,6 +220,13 @@ card_search_result_t scryfall_search(char* keyword) {
     };
 }
 
+void delete_search_result(card_search_result_t sr) {
+    for (size_t ci = 0; ci < sr.len; ci++) {
+        delete_card(sr.cards[ci]);
+    }
+    if(sr.cards != NULL) free(sr.cards);
+}
+
 void delete_card(card_t card) {
     if (card.id) free(card.id);
     if (card.name) free(card.name);

@@ -59,6 +59,13 @@ card_search_result_t scryfall_search(char* keyword);
 card_t init_card();
 
 /**
+ * @brief Deletes a search result and all of it's elements
+ * 
+ * @param sr the search result to de-alloc
+ */
+void delete_search_result(card_search_result_t sr);
+
+/**
  * Frees the allocated memory of the card and any child cards
  * @param card The card to deallocate
 */

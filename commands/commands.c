@@ -32,11 +32,11 @@ void command_search_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* dat
             sprintf(print_buff, "%ld: %s %s\r\n", ci, name, cmc);
             comm_write_message(fd, print_buff);
             free(print_buff);
-            delete_card(sr.cards[ci]);
         }
     } else {
         comm_write_message(fd, "No cards matched your search :(\r\n");
     }
+    delete_search_result(sr);
 }
 
 void command_info_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* data, size_t data_len) {

@@ -24,5 +24,6 @@ void setup_commands();
 
 void command_search_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* data, size_t data_len);
 void command_info_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* data, size_t data_len);
+void command_shutdown(int fd, sockaddr_t* addr, socklen_t addr_len, char* data, size_t data_len);
 
 #endif

@@ -105,4 +105,12 @@ void dict_resize(dict_t dict, size_t new_size);
  */
 float dict_load_factor(dict_t dict);
 
+/**
+ * @brief Flattens a dictionary to a list of key value pairs
+ * 
+ * @param dict the dictionary to flatten
+ * @return arraylist_t returns a list of key_value_pair_t elements
+ */
+arraylist_t dict_to_list(dict_t dict);
+
 #endif

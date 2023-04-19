@@ -123,3 +123,14 @@ void dict_resize(dict_t dict, size_t new_size) {
 float dict_load_factor(dict_t dict) {
     return (float)dict.count / (float)dict.bins->count;
 }
+
+arraylist_t dict_to_list(dict_t dict) {
+    arraylist_t result = create_arraylist(dict.count);
+    for(size_t bi = 0; bi < dict.count; bi++) {
+        arraylist_t* bin = (arraylist_t*)arraylist_index(*dict.bins, bi);
+        for (size_t de = 0; de < bin->count; de++) {
+            arraylist_append(&result, arraylist_index(*bin, de));
+        }
+    }
+    return result;
+}

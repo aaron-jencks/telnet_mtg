@@ -45,7 +45,7 @@ server_def_t create_server_defaults() {
 typedef struct {
     int connfd;
     sockaddr_t* addr;
-    socklen_t* addr_len;
+    socklen_t addr_len;
     size_t buffer_size;
     void (*user_connection_handler)(int, sockaddr_t*, socklen_t, char*, size_t);
 } connection_handler_args_t;
@@ -111,7 +111,7 @@ void* connection_handler(void* args) {
                     char* interbuff = malloc(sizeof(uint8_t) * len);
                     if (!interbuff) goto EXIT_HANDLE;
                     memcpy(interbuff, rbuffer+last_start, sizeof(uint8_t) * len);
-                    cargs->user_connection_handler(cargs->connfd, cargs->addr, sizeof(cargs->addr), interbuff, len);
+                    cargs->user_connection_handler(cargs->connfd, cargs->addr, cargs->addr_len, interbuff, len);
                     free(interbuff);
                 }
 
@@ -189,7 +189,7 @@ void* connection_handler(void* args) {
             char* interbuff = malloc(sizeof(uint8_t) * len);
             if (!interbuff) goto EXIT_HANDLE;
             memcpy(interbuff, rbuffer+last_start, sizeof(uint8_t) * len);
-            cargs->user_connection_handler(cargs->connfd, cargs->addr, sizeof(cargs->addr), interbuff, len);
+            cargs->user_connection_handler(cargs->connfd, cargs->addr, cargs->addr_len, interbuff, len);
             free(interbuff);
         }
     }
@@ -199,7 +199,6 @@ void* connection_handler(void* args) {
     if (pbuffer) free(pbuffer);
     if (rbuffer) free(rbuffer);
     free(cargs->addr);
-    free(cargs->addr_len);
     free(cargs);
     shutdown(cargs->connfd, SHUT_RDWR);
 }
@@ -226,22 +225,15 @@ void server_listen_and_serve(server_def_t definition) {
     for (;;) {
         struct sockaddr_in* caddr = calloc(1, sizeof(struct sockaddr_in));
         if (!caddr) break;
-        socklen_t* caddr_len = malloc(sizeof(socklen_t));
+        socklen_t caddr_len = sizeof(*caddr);
         if (!caddr_len) {
-            free(cargs);
-            break;
-        }
-        *caddr_len = sizeof(*caddr);
-        if (!*caddr_len) {
             free(caddr);
-            free(caddr_len);
             break;
         }
         int csock = accept(celnet_socketfd, (struct sockaddr*)caddr, &caddr_len);
         if (csock < 0) {
             printf("Failed to accept socket\n");
             free(caddr);
-            free(caddr_len);
             break;
         }
 
@@ -255,6 +247,7 @@ void server_listen_and_serve(server_def_t definition) {
         cret = pthread_create(&cthread, NULL, connection_handler, (void*)cargs);
         if (cret) {
             printf("Failed to create pthread handler\n");
+            free(caddr);
             errno = cret;
             return;
         }

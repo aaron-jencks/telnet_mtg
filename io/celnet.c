@@ -198,6 +198,8 @@ void* connection_handler(void* args) {
     printf("Leaving handler loop\n");
     if (pbuffer) free(pbuffer);
     if (rbuffer) free(rbuffer);
+    free(cargs->addr);
+    free(cargs->addr_len);
     free(cargs);
     shutdown(cargs->connfd, SHUT_RDWR);
 }
@@ -224,17 +226,28 @@ void server_listen_and_serve(server_def_t definition) {
     for (;;) {
         struct sockaddr_in* caddr = calloc(1, sizeof(struct sockaddr_in));
         if (!caddr) break;
-        socklen_t caddr_len = sizeof(caddr);
-        if (!caddr_len) break;
+        socklen_t* caddr_len = malloc(sizeof(socklen_t));
+        if (!caddr_len) {
+            free(cargs);
+            break;
+        }
+        *caddr_len = sizeof(*caddr);
+        if (!*caddr_len) {
+            free(caddr);
+            free(caddr_len);
+            break;
+        }
         int csock = accept(celnet_socketfd, (struct sockaddr*)caddr, &caddr_len);
         if (csock < 0) {
             printf("Failed to accept socket\n");
+            free(caddr);
+            free(caddr_len);
             break;
         }
 
         connection_handler_args_t* cargs = malloc(sizeof(connection_handler_args_t));
         if (!cargs) break;
-        *cargs = (connection_handler_args_t){csock, (struct sockaddr_in*)caddr, &caddr_len, definition.buffer_size, definition.connection_handler};
+        *cargs = (connection_handler_args_t){csock, (struct sockaddr_in*)caddr, caddr_len, definition.buffer_size, definition.connection_handler};
 
         pthread_t cthread;
         int cret;

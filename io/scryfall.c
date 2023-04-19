@@ -233,7 +233,7 @@ void delete_card(card_t card) {
 }
 
 char* display_card(card_t* card) {
-    size_t tlen = 4;
+    size_t tlen = 6;
     char *name, *cost, *type, *text=0, *power=0, *toughness=0, *loyalty=0;
 
     if (card->name) {
@@ -245,10 +245,10 @@ char* display_card(card_t* card) {
     }
 
     if (card->manacost) {
-        tlen += strlen(card->manacost);
+        tlen += 1 + strlen(card->manacost); // one for the space
         cost = card->manacost;
     } else {
-        tlen += 1;
+        tlen += 2;
         cost = "0";
     }
 
@@ -289,22 +289,22 @@ char* display_card(card_t* card) {
         handle_memory_error("scryfall.c", 288, finaltemplate);
         finaltemplate[tsize-1] = 0;
         sprintf(finaltemplate, "%s\r\n%s", template, pttemplate);
-        tlen += 4;
+        tlen += 5;
     } else if (loyalty) {
         tsize += strlen(ltemplate) + 2;
         finaltemplate = malloc(sizeof(char) * tsize);
         handle_memory_error("scryfall.c", 295, finaltemplate);
         finaltemplate[tsize-1] = 0;
         sprintf(finaltemplate, "%s\r\n%s", template, ltemplate);
-        tlen += 3;
+        tlen += 4;
     } else {
         finaltemplate = template;
         allocd = 0;
     }
 
-    char* result = malloc(sizeof(char) * (tlen + 1));
+    char* result = malloc(sizeof(char) * tlen);
     handle_memory_error("scryfall.c", 305, result);
-    result[tlen]=0;
+    result[tlen-1]=0;
 
     if (power && toughness) {
         sprintf(result, finaltemplate, name, cost, type, text ? text : "", power, toughness);

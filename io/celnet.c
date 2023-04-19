@@ -118,7 +118,7 @@ void* connection_handler(void* args) {
                 uint8_t response[3] = {IAC, 0, 0};
                 int err;
                 switch((uint8_t)rbuffer[++ri]) {
-                    case 251: // WILL
+                    case 251: ;// WILL
                         uint8_t can = WONT;
                         if (option_handlers[rbuffer[ri+1]]) {
                             can = WILL;
@@ -129,7 +129,7 @@ void* connection_handler(void* args) {
                         if (err < 0) goto EXIT_HANDLE;
                         last_start = ++ri + 1;
                         break;
-                    case 253: // DO
+                    case 253: ;// DO
                         if (option_handlers[rbuffer[ri+1]]) {
                             size_t skip_len = option_handlers[rbuffer[ri+1]](cargs->connfd, rbuffer, rbuff, ri+1);
                             if (skip_len < 0) {
@@ -154,7 +154,7 @@ void* connection_handler(void* args) {
                             last_start = ++ri + 1;
                             break;
                         }
-                    default:
+                    default: ;
                         if (option_handlers[rbuffer[ri]]) {
                             size_t skip_len = option_handlers[rbuffer[ri]](cargs->connfd, rbuffer, rbuff, ri);
                             if (skip_len < 0) {

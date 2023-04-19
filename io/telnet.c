@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <stdbool.h>
 
 #include "telnet.h"
 #include "celnet.h"
@@ -16,6 +18,7 @@ size_t connection_hashing_function(void* key) {
 }
 
 dict_t current_connections;
+dict_t current_sockets;
 pthread_mutex_t connection_lock;
 
 telnet_client_t* create_client(size_t buff_size) {
@@ -26,6 +29,10 @@ telnet_client_t* create_client(size_t buff_size) {
     client->pointer = 0;
     client->capacity = buff_size;
     return client;
+}
+
+void delete_client(telnet_client_t client) {
+    if(client.buffer) free(client.buffer);
 }
 
 void client_append_data(telnet_client_t* client, char* data, size_t data_len) {
@@ -116,8 +123,19 @@ void* client_disconnection_listener(void* args) {
     }
     char* daddrstring = display_ip(dargs->addr, dargs->addrlen);
     printf("Client %s disconnected...\n", daddrstring);
+    pthread_mutex_lock(&connection_lock);
+    telnet_client_t* conn = (telnet_client_t*)dict_remove(&current_connections, dargs->addr);
+    if(conn) {
+        delete_client(*conn);
+        free(conn);
+    }
+    int* fdp = (int*)dict_remove(&current_sockets, dargs->addr);
+    shutdown(*fdp, SHUT_RDWR);
+    if(fdp) free(fdp);
+    pthread_mutex_unlock(&connection_lock);
     free(daddrstring);
     free(dargs->addr);
+    free(dargs);
     return NULL;
 }
 
@@ -125,6 +143,14 @@ void client_cleanup(pthread_t cthread, int fd, sockaddr_t* addr, socklen_t addrl
     char* daddrstring = display_ip(addr, addrlen);
     printf("Client %s connected...\n", daddrstring);
     free(daddrstring);
+
+    int* fdp = malloc(sizeof(int));
+    handle_memory_error("telnet.c", 132, fdp);
+    *fdp = fd;
+
+    pthread_mutex_lock(&connection_lock);
+    dict_put(&current_sockets, addr, fdp);
+    pthread_mutex_unlock(&connection_lock);
 
     disconnection_args_t* args = (disconnection_args_t*)malloc(sizeof(disconnection_args_t));
     handle_memory_error("telnet.c", 128, args);
@@ -144,6 +170,7 @@ void client_cleanup(pthread_t cthread, int fd, sockaddr_t* addr, socklen_t addrl
 
 void launch_telnet_server(uint16_t port) {
     current_connections = create_dict(10, connection_hashing_function);
+    current_sockets = create_dict(10, connection_hashing_function);
     if (pthread_mutex_init(&connection_lock, NULL)) {
         error_at_line(ERR_MUTEX_INIT, 0, "telnet.c", 146, "Failed to initialize mutex for connection lock");
     }
@@ -157,4 +184,15 @@ void launch_telnet_server(uint16_t port) {
 
     pthread_mutex_destroy(&connection_lock);
     destroy_dict(current_connections);
+    destroy_dict(current_sockets);
+}
+
+void shutdown_telnet_server() {
+    pthread_mutex_lock(&connection_lock);
+    arraylist_t conns = dict_to_list(current_sockets, false);
+    for(size_t ci = 0; ci < conns.count; ci++) {
+        shutdown(*(int*)(((key_value_pair_t*)arraylist_index(conns, ci))->value), SHUT_RDWR);
+    }
+    pthread_mutex_unlock(&connection_lock);
+    shutdown(celnet_socketfd, SHUT_RDWR);
 }

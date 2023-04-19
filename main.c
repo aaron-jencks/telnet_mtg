@@ -2,12 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#include <sys/socket.h>
 
 #include "utils/urlencode.h"
 #include "io/sqlite_wrapper.h"
 #include "io/telnet.h"
-#include "io/celnet.h"
 #include "entities/entities.h"
 #include "entities/player.h"
 #include "commands/commands.h"
@@ -15,7 +13,8 @@
 
 void catchkill(int signo) {
     if (signo == SIGINT) {
-        shutdown(celnet_socketfd, SHUT_RDWR);
+        printf("Shutting down...\n");
+        shutdown_telnet_server();
     }
 }
 

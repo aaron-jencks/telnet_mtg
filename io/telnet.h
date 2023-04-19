@@ -21,4 +21,11 @@ typedef struct {
 */
 void launch_telnet_server(uint16_t port);
 
+/**
+ * @brief shuts down all sockets associated with the telnet server
+ * This causes the server to exit
+ * 
+ */
+void shutdown_telnet_server();
+
 #endif

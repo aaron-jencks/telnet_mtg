@@ -185,12 +185,18 @@ card_search_result_t scryfall_search(char* keyword) {
         char* json_error;
         cJSON* json = cJSON_ParseWithOpts(response.response, &json_error, 0);
 
-        if (!json) return (card_search_result_t){NULL, 0};
+        if (!json) {
+            free(result_buff);
+            return (card_search_result_t){NULL, 0};
+        }
 
         double card_count_d = parse_json_for_number(json, "total_cards");
         cJSON* data = cJSON_GetObjectItemCaseSensitive(json, "data");
 
-        if (!data) return (card_search_result_t){NULL, 0};
+        if (!data) {
+            free(result_buff);
+            return (card_search_result_t){NULL, 0};
+        }
 
         for (size_t card_i = 0; card_i < ((card_count_d > 10) ? 10 : card_count_d); card_i++) {
             card_t cresponse = init_card();

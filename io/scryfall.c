@@ -245,10 +245,10 @@ char* display_card(card_t* card) {
     }
 
     if (card->manacost) {
-        tlen += 1 + strlen(card->manacost); // one for the space
+        tlen += strlen(card->manacost);
         cost = card->manacost;
     } else {
-        tlen += 2;
+        tlen += 1;
         cost = "0";
     }
 

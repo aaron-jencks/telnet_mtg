@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 const uint8_t IAC=255, WILL=251, WONT=252, DO=253, DONT=254;
+int socketfd;
 
 /**
  * A mapping of option handlers,
@@ -198,20 +199,21 @@ void* connection_handler(void* args) {
     if (pbuffer) free(pbuffer);
     if (rbuffer) free(rbuffer);
     free(cargs);
+    shutdown(cargs->connfd, SHUT_RDWR);
 }
 
 
 
 void server_listen_and_serve(server_def_t definition) {
     // Initialize the socket
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) return; // There was an error
-    if (definition.options_callback) definition.options_callback(sockfd);
-    if (bind(sockfd, (struct sockaddr*)&definition.address, sizeof(definition.address))) {
+    socketfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (socketfd < 0) return; // There was an error
+    if (definition.options_callback) definition.options_callback(socketfd);
+    if (bind(socketfd, (struct sockaddr*)&definition.address, sizeof(definition.address))) {
         printf("Failed to bind to port\n");
         return;
     }
-    if (listen(sockfd, definition.backlog)) {
+    if (listen(socketfd, definition.backlog)) {
         printf("Failed to start listening\n");
         return;
     }
@@ -221,17 +223,17 @@ void server_listen_and_serve(server_def_t definition) {
     // Begin the loop
     for (;;) {
         struct sockaddr_in* caddr = calloc(1, sizeof(struct sockaddr_in));
-        if (!caddr) return;
+        if (!caddr) break;
         socklen_t caddr_len = sizeof(caddr);
-        if (!caddr_len) return;
-        int csock = accept(sockfd, (struct sockaddr*)caddr, &caddr_len);
+        if (!caddr_len) break;
+        int csock = accept(socketfd, (struct sockaddr*)caddr, &caddr_len);
         if (csock < 0) {
             printf("Failed to accept socket\n");
-            return;
+            break;
         }
 
         connection_handler_args_t* cargs = malloc(sizeof(connection_handler_args_t));
-        if (!cargs) return;
+        if (!cargs) break;
         *cargs = (connection_handler_args_t){csock, (struct sockaddr_in*)caddr, &caddr_len, definition.buffer_size, definition.connection_handler};
 
         pthread_t cthread;
@@ -245,5 +247,7 @@ void server_listen_and_serve(server_def_t definition) {
         }
         if(definition.thread_handler) definition.thread_handler(cthread, csock, (struct sockaddr_in*)caddr, caddr_len);
     }
+
+    shutdown(socketfd, SHUT_RDWR); // just in case
 }
 

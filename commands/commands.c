@@ -43,7 +43,7 @@ void command_info_card(int fd, sockaddr_t* addr, socklen_t addr_len, char* data,
     printf("Searching for %s\n", data);
     card_t sr = scryfall_find(data);
     char* line = display_card(&sr);
-    char* pbuff = malloc(sizeof(char) * (strlen(line) + 2));
+    char* pbuff = malloc(sizeof(char) * (strlen(line) + 3));
     handle_memory_error("commands.c", 46, pbuff);
     sprintf(pbuff, "%s\r\n", line);
     comm_write_message(fd, pbuff);

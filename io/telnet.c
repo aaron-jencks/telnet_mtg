@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <stdbool.h>
 
@@ -169,6 +170,11 @@ void client_cleanup(pthread_t cthread, int fd, sockaddr_t* addr, socklen_t addrl
     }
 }
 
+void telnet_set_socket_options(int fd) {
+    int yes = 1;
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+}
+
 void launch_telnet_server(uint16_t port) {
     current_connections = create_dict(10, connection_hashing_function);
     current_sockets = create_dict(10, connection_hashing_function);
@@ -180,6 +186,7 @@ void launch_telnet_server(uint16_t port) {
     definition.address.sin_port = htons(port);
     definition.connection_handler = telnet_connection_handler;
     definition.thread_handler = client_cleanup;
+    definition.options_callback = telnet_set_socket_options;
 
     server_listen_and_serve(definition);
 
